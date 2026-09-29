@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="{{ site.lang | default: "en-US" }}">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+{% seo %}
+    <link rel="stylesheet" href="{{ "/assets/css/style.css?v=" | append: site.github.build_revision | relative_url }}">
+    <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <![endif]-->
+    {% include head-custom.html %}
+    <style>
+      header nav { margin: 0 0 24px; }
+      header nav a { display: block; padding: 2px 0; }
+      header .side-heading {
+        margin: 24px 0 6px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        color: #7a7a7a;
+      }
+      header .toc { list-style: none; margin: 0; padding: 0; font-size: 13px; line-height: 1.5; }
+      header .toc li { margin: 0 0 4px; }
+      header .toc li.lvl-3 { padding-left: 12px; }
+      header .toc a { border: 0; }
+      header .meta { font-size: 13px; color: #7a7a7a; margin: 0 0 4px; }
+      /* long code listings should scroll, not stretch the column */
+      section pre > code { white-space: pre; }
+      section table { display: block; overflow-x: auto; }
+    </style>
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1><a href="{{ "/" | absolute_url }}">{{ site.title | default: site.github.repository_name }}</a></h1>
+
+        {% if site.logo %}
+          <img src="{{site.logo | relative_url}}" alt="Logo" />
+        {% endif %}
+
+        <p>{{ site.description | default: site.github.project_tagline }}</p>
+
+        <nav>
+          <a href="{{ "/" | relative_url }}">&larr; Home</a>
+        </nav>
+
+        {% if page.course or page.date %}
+        <p class="side-heading">This page</p>
+        {% if page.course %}<p class="meta">{{ page.course }}</p>{% endif %}
+        {% if page.date %}<p class="meta">{{ page.date | date: "%B %-d, %Y" }}</p>{% endif %}
+        {% endif %}
+
+        {% comment %}
+          Build a table of contents from the rendered h2/h3 tags. kramdown
+          gives every heading an id, so no plugin is needed - which matters
+          because GitHub Pages only runs whitelisted plugins.
+        {% endcomment %}
+        {% assign chunks = content | split: '<h' %}
+        {% assign toc = '' %}
+        {% for chunk in chunks offset: 1 %}
+          {% assign level = chunk | slice: 0 %}
+          {% if level == '2' or level == '3' %}
+            {% assign id = chunk | split: 'id="' %}
+            {% if id.size > 1 %}
+              {% assign anchor = id[1] | split: '"' | first %}
+              {% assign parts = chunk | split: '">' %}
+              {% assign label = parts[1] | split: '</h' | first | strip_html | strip %}
+              {% if label != '' %}
+                {% capture toc %}{{ toc }}<li class="lvl-{{ level }}"><a href="#{{ anchor }}">{{ label }}</a></li>{% endcapture %}
+              {% endif %}
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+        {% if toc != '' %}
+        <p class="side-heading">On this page</p>
+        <ul class="toc">{{ toc }}</ul>
+        {% endif %}
+
+        <p class="side-heading">Links</p>
+        <nav>
+          {% if site.github.repository_url %}
+          <a href="{{ site.github.repository_url }}">Source repository</a>
+          {% endif %}
+          {% if site.github.owner_url %}
+          <a href="{{ site.github.owner_url }}">GitHub profile</a>
+          {% endif %}
+        </nav>
+
+        {% if site.show_downloads %}
+        <ul class="downloads">
+          <li><a href="{{ site.github.zip_url }}">Download <strong>ZIP File</strong></a></li>
+          <li><a href="{{ site.github.tar_url }}">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="{{ site.github.repository_url }}">View On <strong>GitHub</strong></a></li>
+        </ul>
+        {% endif %}
+      </header>
+      <section>
+
+      {{ content }}
+
+      </section>
+      <footer>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
+  </body>
+</html>

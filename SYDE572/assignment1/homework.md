@@ -1,5 +1,8 @@
 ---
 layout: default
+title: SYDE 572 — Assignment 1
+course: SYDE 572 · Assignment 1
+date: 2026-09-29
 ---
 
 # Assignment 1
@@ -79,7 +82,7 @@ Each cubic has exactly one real root, so the critical point is
 unique in every case and no comparison between candidates is
 needed.
 
-## Method 2: Newton-Raphson Method
+### Method 2: Newton-Raphson Method
 
 Newton-Raphson method require both first order derivative and
 second order derivative. The original and the first order of
