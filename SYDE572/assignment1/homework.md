@@ -7,7 +7,7 @@ date: 2026-09-29
 
 # Assignment 1
 
-> Author: Yuchen Lin
+> Author: Yuchen Lin \\
 > Date: 2026-09-29
 
 ## Part 1:
@@ -197,7 +197,7 @@ summarized below.
 | Second | $$0.545$$ | $$0.649$$ | $$25.570$$ | $$7.604$$ |
 | Third | $$0.520$$ | $$0.004$$ | $$25.246$$ | $$7.603$$ |
 
-### Converging Results from Python Script
+#### Converging Results from Python Script
 
 A Python script iterates the algorithm to convergence, stopping
 once the step size falls below a tolerance of $$10^{-7}$$.
@@ -329,7 +329,8 @@ $$\phi = \frac{1+\sqrt{5}}{2} = 1.618$$
 
 $\phi^{-1}$: $2-\phi = 0.382$
 
-The two updating formula are 
+The two update formulas are
+
 $$
 x_1= a + \phi^{-1}\times (b-a) \tag{6}\label{eq:update_x1}
 $$
