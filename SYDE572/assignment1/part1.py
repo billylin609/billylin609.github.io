@@ -93,8 +93,7 @@ def plot(x: float, x0: float, f: Callable, y0: float, method: str, start: str):
   ax.set_axisbelow(True)
   ax.set_xlabel('x')
   ax.set_ylabel('y')
-  ax.set_title(f'{method}: shortest distance from ({x0:.2f}, {y0:.2f}) '
-               f'to the curve\n({start})')
+  ax.set_title(f'Point ({x0:g}, {y0:g}), {start.replace("_", " ")}')
   ax.legend(loc='lower right', framealpha=0.9)
 
   out_dir = Path(__file__).parent / method
