@@ -311,3 +311,264 @@ if __name__ == '__main__':
     print(f'Summary: Best x: {closest_x:.4f}, '
           f'Distance: {distance(closest_x, x0, f(closest_x), y0):.4f}')
 ```
+
+### Method 3: Golden Bisection Search Method
+
+Golden bisection search does not require heavy computation on the derivative,
+but require a range to search for the closest point. The manual computation only
+use range $[-1, 1]$ for computation simplicity. The coding solution will use a
+wider range.
+
+**Compute Initial Parameter:**
+
+Range: $[-1, 1]$
+
+Initial Point: $(0, 0)$
+
+$$\phi = \frac{1+\sqrt{5}}{2} = 1.618$$
+
+$\phi^{-1}$: $2-\phi = 0.382$
+
+The two updating formula are 
+$$
+x_1= a + \phi^{-1}\times (b-a) \tag{6}\label{eq:update_x1}
+$$
+
+and
+
+$$
+x_2= b - \phi^{-1}\times (b-a) \tag{7}\label{eq:update_x2}
+$$
+
+Objective distance function is computed using eq. $$\eqref{eq:objective}$$.
+
+Before start of iteration 1, the parameter are listed as following.
+
+| $$a$$ | $$b$$ | $$x_1$$ | $$x_2$$ | $$D(x_1)$$ | $$D(x_2)$$ |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| $$-1.000$$ | $$1.000$$ | $$-0.236$$ | $$0.236$$ | $$25.616$$ | $$25.616$$ |
+
+**Iteration 1**
+
+The iteration start with two condition checking:
+
+$$
+\left| b-a \right| = 2 > 0.001
+$$
+
+$$
+D(x_1) = D(x_2)
+$$
+
+The first condition keeps the loop running. The second makes the strict
+test $$D(x_1) < D(x_2)$$ fail, so the algorithm takes the `else` branch.
+That branch discards the left portion of the interval: it assigns $$a
+\leftarrow x_1$$, carries $$x_2$$ and $$D(x_2)$$ over into $$x_1$$ and
+$$D(x_1)$$, and recomputes only $$x_2$$ and $$D(x_2)$$ from
+eq. $$\eqref{eq:update_x2}$$. Result is summarized in the following table:
+
+| $$a$$ | $$b$$ | $$x_1$$ | $$x_2$$ | $$D(x_1)$$ | $$D(x_2)$$ |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| $$-0.236$$ | $$1.000$$ | $$0.236$$ | $$0.528$$ | $$25.616$$ | $$28.143$$ |
+
+**Iteration 2:**
+
+Performing the same two conditional tests:
+
+$$
+\left| b-a \right| = 1.236 > 0.001
+$$
+
+$$
+D(x_1) < D(x_2)
+$$
+
+The test now holds, so the algorithm takes the `if` branch: it assigns
+$$b \leftarrow x_2$$, carries $$x_1$$ into $$x_2$$, and recomputes only
+$$x_1$$ from eq. $$\eqref{eq:update_x1}$$.
+
+| $$a$$ | $$b$$ | $$x_1$$ | $$x_2$$ | $$D(x_1)$$ | $$D(x_2)$$ |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| $$-0.236$$ | $$0.528$$ | $$0.056$$ | $$0.236$$ | $$25.034$$ | $$25.616$$ |
+
+**Iteration 3**
+
+Continue the same condition check and compute the third iteration.
+
+$$
+\left| b-a \right| = 0.76389 > 0.001
+$$
+
+$$
+D(x_1) < D(x_2)
+$$
+
+The algorithm takes the `if` branch again: it assigns
+$$b \leftarrow x_2$$, carries $$x_1$$ into $$x_2$$, and recomputes only
+$$x_1$$ from eq. $$\eqref{eq:update_x1}$$.
+
+| $$a$$ | $$b$$ | $$x_1$$ | $$x_2$$ | $$D(x_1)$$ | $$D(x_2)$$ |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| $$-0.236$$ | $$0.236$$ | $$-0.056$$ | $$0.056$$ | $$25.034$$ | $$25.034$$ |
+
+The final estimate is the midpoint of the bracket,
+$$\frac{-0.236 + 0.236}{2} = 0$$, giving a distance of $$d = 5$$ — the
+same result as both earlier methods.
+
+Here is the summary of three iteration for all methods.
+
+**Point $$(0, 0)$$, bracket $$[-1, 1]$$**
+
+| Iteration | $$a$$ | $$b$$ | $$x_1$$ | $$x_2$$ | $$D(x_1)$$ | $$D(x_2)$$ |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: |
+| 0 | $$-1.000$$ | $$1.000$$ | $$-0.236$$ | $$0.236$$ | $$25.616$$ | $$25.616$$ |
+| 1 | $$-0.236$$ | $$1.000$$ | $$0.236$$ | $$0.528$$ | $$25.616$$ | $$28.143$$ |
+| 2 | $$-0.236$$ | $$0.528$$ | $$0.056$$ | $$0.236$$ | $$25.034$$ | $$25.616$$ |
+| 3 | $$-0.236$$ | $$0.236$$ | $$-0.056$$ | $$0.056$$ | $$25.034$$ | $$25.034$$ |
+
+Midpoint $$0.000$$, closest point $$(0.000,\ 5.000)$$, distance
+$$d = 5.000$$.
+
+**Point $$(-4, 0)$$, bracket $$[-1, 1]$$**
+
+| Iteration | $$a$$ | $$b$$ | $$x_1$$ | $$x_2$$ | $$D(x_1)$$ | $$D(x_2)$$ |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: |
+| 0 | $$-1.000$$ | $$1.000$$ | $$-0.236$$ | $$0.236$$ | $$39.728$$ | $$43.505$$ |
+| 1 | $$-1.000$$ | $$0.236$$ | $$-0.528$$ | $$-0.236$$ | $$39.920$$ | $$39.728$$ |
+| 2 | $$-0.528$$ | $$0.236$$ | $$-0.236$$ | $$-0.056$$ | $$39.728$$ | $$40.588$$ |
+| 3 | $$-0.528$$ | $$-0.056$$ | $$-0.348$$ | $$-0.236$$ | $$39.563$$ | $$39.728$$ |
+
+Midpoint $$-0.292$$, closest point $$(-0.292,\ 5.085)$$, distance
+$$d = 6.294$$.
+
+**Point $$(-8, 0)$$, bracket $$[-1, 1]$$**
+
+| Iteration | $$a$$ | $$b$$ | $$x_1$$ | $$x_2$$ | $$D(x_1)$$ | $$D(x_2)$$ |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: |
+| 0 | $$-1.000$$ | $$1.000$$ | $$-0.236$$ | $$0.236$$ | $$85.839$$ | $$93.393$$ |
+| 1 | $$-1.000$$ | $$0.236$$ | $$-0.528$$ | $$-0.236$$ | $$83.697$$ | $$85.839$$ |
+| 2 | $$-1.000$$ | $$-0.236$$ | $$-0.708$$ | $$-0.528$$ | $$83.437$$ | $$83.697$$ |
+| 3 | $$-1.000$$ | $$-0.528$$ | $$-0.820$$ | $$-0.708$$ | $$83.727$$ | $$83.437$$ |
+
+Midpoint $$-0.764$$, closest point $$(-0.764,\ 5.584)$$, distance
+$$d = 9.140$$.
+
+**Point $$(2, 0)$$, bracket $$[-1, 1]$$**
+
+| Iteration | $$a$$ | $$b$$ | $$x_1$$ | $$x_2$$ | $$D(x_1)$$ | $$D(x_2)$$ |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: |
+| 0 | $$-1.000$$ | $$1.000$$ | $$-0.236$$ | $$0.236$$ | $$30.560$$ | $$28.672$$ |
+| 1 | $$-0.236$$ | $$1.000$$ | $$0.236$$ | $$0.528$$ | $$28.672$$ | $$30.031$$ |
+| 2 | $$-0.236$$ | $$0.528$$ | $$0.056$$ | $$0.236$$ | $$28.811$$ | $$28.672$$ |
+| 3 | $$0.056$$ | $$0.528$$ | $$0.236$$ | $$0.348$$ | $$28.672$$ | $$28.953$$ |
+
+Midpoint $$0.292$$, closest point $$(0.292,\ 5.085)$$, distance
+$$d = 5.364$$.
+
+**Point $$(6, 0)$$, bracket $$[-1, 1]$$**
+
+| Iteration | $$a$$ | $$b$$ | $$x_1$$ | $$x_2$$ | $$D(x_1)$$ | $$D(x_2)$$ |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: |
+| 0 | $$-1.000$$ | $$1.000$$ | $$-0.236$$ | $$0.236$$ | $$64.449$$ | $$58.783$$ |
+| 1 | $$-0.236$$ | $$1.000$$ | $$0.236$$ | $$0.528$$ | $$58.783$$ | $$57.808$$ |
+| 2 | $$0.236$$ | $$1.000$$ | $$0.528$$ | $$0.708$$ | $$57.808$$ | $$58.270$$ |
+| 3 | $$0.236$$ | $$0.708$$ | $$0.416$$ | $$0.528$$ | $$57.941$$ | $$57.808$$ |
+
+Midpoint $$0.472$$, closest point $$(0.472,\ 5.223)$$, distance
+$$d = 7.605$$.
+
+#### Converging Results from Python Script
+
+A Python script runs the same search over the wider bracket
+$$[-10, 10]$$, stopping once $$\left| b-a \right|$$ falls below a
+tolerance of $$10^{-7}$$. The converged results for all five points are
+listed below, and match both earlier methods to four decimal places.
+
+| Point $$(x_0, y_0)$$ | Best $$x^*$$ | Closest point | Distance $$d$$ |
+| :--- | ---: | :---: | ---: |
+| $$(0, 0)$$  | $$0.0000$$  | $$(0.0000,\ 5.0000)$$  | $$5.0000$$ |
+| $$(-4, 0)$$ | $$-0.3555$$ | $$(-0.3555,\ 5.1264)$$ | $$6.2898$$ |
+| $$(-8, 0)$$ | $$-0.6721$$ | $$(-0.6721,\ 5.4517)$$ | $$9.1334$$ |
+| $$(2, 0)$$  | $$0.1807$$  | $$(0.1807,\ 5.0327)$$  | $$5.3514$$ |
+| $$(6, 0)$$  | $$0.5199$$  | $$(0.5199,\ 5.2703)$$  | $$7.6031$$ |
+
+Each figure below plots the curve $$f(x)=x^2+5$$ and the shortest distance to
+the point.
+
+![Golden-section result for (0, 0)](method2/fig_point_0.000_0.000_bracket_-10.0_10.0.png)
+
+*Point $$(0,0)$$ — closest point $$(0.0000,\ 5.0000)$$, $$d=5.0000$$.*
+
+![Golden-section result for (-4, 0)](method2/fig_point_-4.000_0.000_bracket_-10.0_10.0.png)
+
+*Point $$(-4,0)$$ — closest point $$(-0.3555,\ 5.1264)$$, $$d=6.2898$$.*
+
+![Golden-section result for (-8, 0)](method2/fig_point_-8.000_0.000_bracket_-10.0_10.0.png)
+
+*Point $$(-8,0)$$ — closest point $$(-0.6721,\ 5.4517)$$, $$d=9.1334$$.*
+
+![Golden-section result for (2, 0)](method2/fig_point_2.000_0.000_bracket_-10.0_10.0.png)
+
+*Point $$(2,0)$$ — closest point $$(0.1807,\ 5.0327)$$, $$d=5.3514$$.*
+
+![Golden-section result for (6, 0)](method2/fig_point_6.000_0.000_bracket_-10.0_10.0.png)
+
+*Point $$(6,0)$$ — closest point $$(0.5199,\ 5.2703)$$, $$d=7.6031$$.*
+
+The complete implementation is listed below, and is also available on
+[GitHub](https://github.com/billylin609/billylin609.github.io/blob/main/SYDE572/assignment1/part2.py).
+
+```python
+import numpy as np
+
+def golden_bisection(x0, y0, f, a, b, tolerance=1e-7):
+  phi = (1 + np.sqrt(5))/2
+  resphi = 2 - phi
+  x1 = update_x1(a, b, resphi)
+  x2 = update_x2(a, b, resphi)
+  dist_x1 = objective_fn(x1, x0, f(x1), y0)
+  dist_x2 = objective_fn(x2, x0, f(x2), y0)
+  i = 0
+  print(f'{"epoch":>5} {"a":>10} {"b":>10} {"x1":>10} {"x2":>10} '
+        f'{"D(x1)":>12} {"D(x2)":>12}')
+  while abs(b-a) > tolerance:
+    i += 1
+    if dist_x1 < dist_x2:
+      b = x2
+      x2 = x1
+      dist_x2 = dist_x1
+      x1 = update_x1(a, b, resphi)
+      dist_x1 = objective_fn(x1, x0, f(x1), y0)
+    else:
+      a = x1
+      x1 = x2
+      dist_x1 = dist_x2
+      x2 = update_x2(a, b, resphi)
+      dist_x2 = objective_fn(x2, x0, f(x2), y0)
+    print(f'{i:>5d} {a:>10.4f} {b:>10.4f} {x1:>10.4f} {x2:>10.4f} '
+          f'{dist_x1:>12.4f} {dist_x2:>12.4f}')
+  return (a+b)/2
+
+def objective_fn(x, x0, f, y0):
+  return (x-x0)**2+(f-y0)**2
+
+def distance(x, x0, f, y0):
+  return np.sqrt((x-x0)**2+(f-y0)**2)
+
+def update_x1(a, b, resphi):
+  return a + resphi * (b-a)
+
+def update_x2(a, b, resphi):
+  return b - resphi * (b-a)
+
+f = lambda x: x**2+5
+
+points = ((0, 0), (-4, 0), (-8, 0), (2, 0), (6, 0))
+brackets = ((-10, 10), (-10, 10), (-10, 10), (-10, 10), (-10, 10))
+
+for (x0, y0), (a, b) in zip(points, brackets):
+  print(f'\n\n Points: ({x0}, {y0}), Bracket: [{a}, {b}]')
+  best_x = golden_bisection(x0=x0, y0=y0, f=f, a=a, b=b)
+  print(f'Summary: Best x: {best_x:.4f}, '
+        f'Distance: {distance(best_x, x0, f(best_x), y0):.4f}')
+```
