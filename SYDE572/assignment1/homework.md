@@ -573,3 +573,564 @@ for (x0, y0), (a, b) in zip(points, brackets):
   print(f'Summary: Best x: {best_x:.4f}, '
         f'Distance: {distance(best_x, x0, f(best_x), y0):.4f}')
 ```
+
+### Discussion
+
+The current methods are not able to find the shortest distance when
+there are multiple real solutions and the initial guess is poor.
+
+![Newton-Raphson converging to a local minimum](method5/fig_point_2.000_10.000_newton_single_init_1.000.png)
+
+*From $$(2, 10)$$ with an initial guess of $$x=1$$, Newton-Raphson
+returns $$x=-2$$ at a distance of $$4.123$$, when the true nearest
+point is at $$x=2.225$$ and a distance of only $$0.230$$.*
+
+![Comparison of the two normals and the D(x) landscape](method5/fig_comparison_point_2.000_10.000.png)
+
+*$$D(x)$$ has two local minima, so the method converges to whichever
+one its initial guess falls nearest. Running it from several starting
+points and keeping the nearest result recovers the true minimum.*
+
+The new algorithm was tested on two further points and works.
+
+| Point $$(x_0, y_0)$$ | $$x^*$$ | Distance $$d$$ |
+| :--- | ---: | ---: |
+| $$(3, 16)$$ | $$3.3096$$ | $$0.3131$$ |
+| $$(-4, 25)$$ | $$-4.4663$$ | $$0.4692$$ |
+
+Nothing in the method is specific to a polynomial — only $$f$$, $$f'$$
+and $$f''$$ are required. The same algorithm was run on an exponential,
+a logarithmic and a radical curve, and every result matches a
+brute-force search over the domain.
+
+| Curve | Point $$(x_0, y_0)$$ | Domain | $$x^*$$ | Distance $$d$$ |
+| :--- | :--- | :--- | ---: | ---: |
+| $$f(x) = e^x$$ | $$(1, 0)$$ | $$[-4, 2]$$ | $$0.0000$$ | $$1.4142$$ |
+| $$f(x) = \ln x$$ | $$(1, 3)$$ | $$[0.05, 6]$$ | $$2.0858$$ | $$2.5117$$ |
+| $$f(x) = \sqrt{x}$$ | $$(5, 0)$$ | $$[0.01, 8]$$ | $$4.5000$$ | $$2.1794$$ |
+
+![Multi-start result for (3, 16)](method5/fig_point_3.000_16.000_multi_init_5.000.png)
+
+![Multi-start result for (-4, 25)](method5/fig_point_-4.000_25.000_multi_init_-5.000.png)
+
+![Exponential curve](method5/fig_exponential_point_1.000_0.000.png)
+
+![Logarithmic curve](method5/fig_logarithm_point_1.000_3.000.png)
+
+![Square root curve](method5/fig_square_root_point_5.000_0.000.png)
+
+The intermediate steps below show the first four Newton iterations on
+each curve, numbered from the initial guess and shaded light to dark.
+
+![Exponential intermediate steps](method5/fig_exponential_iterates.png)
+
+![Logarithmic intermediate steps](method5/fig_logarithm_iterates.png)
+
+![Square root intermediate steps](method5/fig_square_root_iterates.png)
+
+Intermediate steps of the two methods.
+
+![Newton-Raphson intermediate steps](method1/fig_steps_point_-8.000_0.000_init_3.000.png)
+
+![Golden-section intermediate steps](method2/fig_intervals_point_-8.000_0.000.png)
+
+
+## Part 2:
+
+### Method 1 (Analytic Solution):
+
+Given points: $(0,0.5)$, $(2,3.5)$, $(1,1.5)$, and $(3,7.5)$.
+
+**Line Fitting**
+
+Start with line fitting and linear function is given $y=mx+b$
+
+Represent the system in matrix form(over-constraint):
+
+$$
+A = 
+\begin{bmatrix}
+  x_1 & 1 \\
+  x_2 & 1 \\
+  x_3 & 1 \\
+  x_4 & 1
+\end{bmatrix}
+$$
+
+$$
+x = \begin{bmatrix}
+  m \\
+  b
+\end{bmatrix}
+$$
+
+$$
+b =
+\begin{bmatrix}
+  y_1 \\
+  y_2 \\
+  y_3 \\
+  y_4
+\end{bmatrix}
+$$
+
+The linear system can be represented as $Ax=b$,
+using pseudo inverse we are able to compute the
+optimal solution in the system.
+
+Pseudo inverse are defined as:
+
+$$
+x^{*} = (A^T \times A)^{-1} \times A^T \times b
+$$
+
+Solve it parts by parts:
+
+$$
+\begin{align}
+A^T \times A &=
+\begin{bmatrix}
+  0 & 2 & 1 & 3 \\
+  1 & 1 & 1 & 1 \\
+\end{bmatrix}
+\times 
+\begin{bmatrix}
+  0 & 1 \\
+  2 & 1 \\
+  1 & 1 \\
+  3 & 1
+\end{bmatrix} \\
+&=
+\begin{bmatrix}
+  14 & 6 \\
+  6 & 4 
+\end{bmatrix}
+\end{align}
+$$
+
+$$
+\begin{align}
+  (A^T \times A)^{-1} &= \frac{1}{det{(A^T \times A)}}
+  \begin{bmatrix}
+    d & -b \\
+    -c & a
+  \end{bmatrix}
+  &= 
+  \begin{bmatrix}
+    0.2 & -0.3 \\
+    -0.3 & 0.7
+  \end{bmatrix}
+\end{align}
+$$
+
+$$
+\begin{align}
+  (A^T \times A)^{-1} \times A^T \times b &=
+  \begin{bmatrix}
+    0.2 & -0.3 \\
+    -0.3 & 0.7
+  \end{bmatrix} \times
+  \begin{bmatrix}
+    0 & 2 & 1 & 3 \\
+    1 & 1 & 1 & 1
+  \end{bmatrix} \times
+  \begin{bmatrix}
+    0.5 \\
+    3.5 \\
+    1.5 \\
+    7.5
+  \end{bmatrix} \\
+  &=
+  \begin{bmatrix}
+    2.3 \\
+    -0.2
+  \end{bmatrix}
+\end{align}
+$$
+
+Therefore the line of best fit is $f(x) = 2.3x - 0.2$ with $MSE=0.575$.
+
+**Parabola Fitting**
+
+The function can be written as $f(x) = a^2 + bx + c$
+
+The system can represented as the following matrix:
+
+$$
+A = 
+\begin{bmatrix}
+  x_1^2 & x_1 & 1 \\
+  x_2^2 & x_2 & 1 \\
+  x_3^2 & x_3 & 1 \\
+  x_4^2 & x_4 & 1
+\end{bmatrix}
+$$
+
+$$
+x = \begin{bmatrix}
+  a \\
+  b \\
+  c
+\end{bmatrix}
+$$
+
+$$
+b =
+\begin{bmatrix}
+  y_1 \\
+  y_2 \\
+  y_3 \\
+  y_4
+\end{bmatrix}
+$$
+
+The linear system can be represented as $Ax=b$,
+using pseudo inverse we are able to compute the
+optimal solution in the system.
+
+Pseudo inverse are defined as:
+
+$$
+x^{*} = (A^T \times A)^{-1} \times A^T \times b
+$$
+
+Solve it parts by parts:
+
+$$
+\begin{align}
+A^T \times A &=
+\begin{bmatrix}
+  0 & 4 & 1 & 9 \\
+  0 & 2 & 1 & 3 \\
+  1 & 1 & 1 & 1 \\
+\end{bmatrix}
+\times 
+\begin{bmatrix}
+  0 & 0 & 1 \\
+  4 & 2 & 1 \\
+  1 & 1 & 1 \\
+  9 & 3 & 1
+\end{bmatrix} \\
+&=
+\begin{bmatrix}
+  98 & 36 & 14 \\
+  36 & 14 & 6 \\
+  14 & 6 & 4 
+\end{bmatrix}
+\end{align}
+$$
+
+$$
+\begin{align}
+  (A^T \times A)^{-1} = 
+  \begin{bmatrix}
+    0.25 & -0.75 & 0.25 \\
+    -0.75 & 2.45 & -1.05 \\
+    0.25 & -1.05 & 0.95
+  \end{bmatrix}
+\end{align}
+$$
+
+$$
+\begin{align}
+  (A^T \times A)^{-1} \times A^T \times b &=
+  \begin{bmatrix}
+    0.25 & -0.75 & 0.25 \\
+    -0.75 & 2.45 & -1.05 \\
+    0.25 & -1.05 & 0.95
+  \end{bmatrix} \times
+  \begin{bmatrix}
+    0 & 4 & 1 & 9 \\
+    0 & 2 & 1 & 3 \\
+    1 & 1 & 1 & 1 \\
+  \end{bmatrix} \times
+  \begin{bmatrix}
+    0.5 \\
+    3.5 \\
+    1.5 \\
+    7.5
+  \end{bmatrix} \\
+  &=
+  \begin{bmatrix}
+    0.75 \\
+    0.05 \\
+    0.55
+  \end{bmatrix}
+\end{align}
+$$
+
+Therefore the line of best fit is $f(x) = 0.75x^2 +0.05x + 0.55$ with $MSE=0.0125$.
+
+### Method 2: Numerical Solution
+
+The goal is to use the MSE function $Err = MSE = \frac{1}{n} \sum(f(x_i)-y_i)$.
+Each step function for Newton-Raphson method can be summarized as
+$x_{new}=x - \frac{\frac{\partial E}{\partial x}}{\frac{\partial^2 E}{\partial x^2}}$
+
+**Linear Function**
+
+Linear function can be expressed as $y=mx+b$. Fix one variable and compute the
+first and second order of partial derivative.
+
+Case 1(fix b):
+
+$$
+\begin{align}
+  \frac{\partial E}{\partial m} &= \frac{2}{n} \sum(mx_i+b - y_i)\cdot x_i \\
+      &= \frac{1}{2} (14m + 6b -31)
+\end{align}
+$$
+
+Case 2(fix m):
+
+$$
+\begin{align}
+  \frac{\partial E}{\partial b} &= \frac{2}{n} \sum(mx_i+b - y_i) \\
+      &= \frac{1}{2} (6m + 4b - 13)
+\end{align}
+$$
+
+The second order partial derivatives are constant, since $$E$$ is
+quadratic in both coefficients:
+
+$$
+\begin{align}
+  \frac{\partial^2 E}{\partial m^2} &= \frac{2}{n} \sum x_i^2 = 7 \\
+  \frac{\partial^2 E}{\partial b^2} &= \frac{2}{n} \cdot n = 2
+\end{align}
+$$
+
+Each step function are $m_{new}=m-\frac{14m+6b-31}{14}$ and
+$b_{new} = b - \frac{6m+4b-13}{4}$.
+
+Starting from $$(m, b) = (1, 1)$$ and substituting the updated $$m$$
+into the $$b$$ step, the first two iterations give:
+
+| Iteration | $$m$$ | $$b$$ | $$\left\|\Delta\right\|$$ | MSE |
+| :--- | ---: | ---: | ---: | ---: |
+| 0 (initial) | $$1.0000$$ | $$1.0000$$ | — | $$3.2500$$ |
+| 1 | $$1.7857$$ | $$0.5714$$ | $$0.8950$$ | $$0.9056$$ |
+| 2 | $$1.9694$$ | $$0.2959$$ | $$0.3311$$ | $$0.7116$$ |
+
+Iterating to a tolerance of $$10^{-7}$$ converges after 36 iterations to
+
+$$
+y = 2.3000x - 0.2000, \qquad \text{MSE} = 0.5750 \tag{8}\label{eq:line_fit}
+$$
+
+which matches the analytical least-squares solution of Method 1.
+
+![Final linear fit](method4/fig_line_final.png)
+
+*The converged line against the four data points.*
+
+![All linear iterations](method4/fig_line_iterations.png)
+
+*Every iterate, shaded light to dark, collapsing onto the final fit.*
+
+![Linear MSE per epoch](method4/fig_line_mse.png)
+
+*Mean squared error per epoch, flattening at $$0.5750$$.*
+
+**Parabola Function**
+
+Parabola function can be expressed as $y=ax^2+bx+c$. Fix two variable and compute the first and second order of partial derivative.
+
+With $$n=4$$ the required sums are $$\sum x_i = 6$$,
+$$\sum x_i^2 = 14$$, $$\sum x_i^3 = 36$$, $$\sum x_i^4 = 98$$,
+$$\sum y_i = 13$$, $$\sum x_i y_i = 31$$ and $$\sum x_i^2 y_i = 83$$.
+
+Case 1 (fix $$b$$, $$c$$):
+
+$$
+\begin{align}
+  \frac{\partial E}{\partial a} &= \frac{2}{n} \sum\left(ax_i^2+bx_i+c-y_i\right)x_i^2 \\
+      &= \frac{1}{2}\left(98a + 36b + 14c - 83\right) 
+\end{align}
+$$
+
+Case 2 (fix $$a$$, $$c$$):
+
+$$
+\begin{align}
+  \frac{\partial E}{\partial b} &= \frac{2}{n} \sum\left(ax_i^2+bx_i+c-y_i\right)x_i \\
+      &= \frac{1}{2}\left(36a + 14b + 6c - 31\right)
+\end{align}
+$$
+
+Case 3 (fix $$a$$, $$b$$):
+
+$$
+\begin{align}
+  \frac{\partial E}{\partial c} &= \frac{2}{n} \sum\left(ax_i^2+bx_i+c-y_i\right) \\
+      &= \frac{1}{2}\left(14a + 6b + 4c - 13\right)
+\end{align}
+$$
+
+The second order partial derivatives are constant, since $$E$$ is
+quadratic in every coefficient:
+
+$$
+\begin{align}
+  \frac{\partial^2 E}{\partial a^2} &= \frac{2}{n} \sum x_i^4 = 49 \\
+  \frac{\partial^2 E}{\partial b^2} &= \frac{2}{n} \sum x_i^2 = 7 \\
+  \frac{\partial^2 E}{\partial c^2} &= \frac{2}{n} \cdot n = 2 \tag{12}\label{eq:par_second}
+\end{align}
+$$
+
+Each step function is therefore
+
+$$
+\begin{align}
+  a_{new} &= a - \frac{98a + 36b + 14c - 83}{98} \\
+  b_{new} &= b - \frac{36a + 14b + 6c - 31}{14} \\
+  c_{new} &= c - \frac{14a + 6b + 4c - 13}{4}
+\end{align}
+$$
+
+Starting from $$(a, b, c) = (1, 1, 1)$$ and substituting each updated
+coefficient into the next step, the first two iterations give:
+
+| Iteration | $$a$$ | $$b$$ | $$c$$ | $$\left\|\Delta\right\|$$ | MSE |
+| :--- | ---: | ---: | ---: | ---: | ---: |
+| 0 (initial) | $$1.0000$$ | $$1.0000$$ | $$1.0000$$ | — | $$11.2500$$ |
+| 1 | $$0.3367$$ | $$0.9198$$ | $$0.6917$$ | $$0.7358$$ | $$0.3544$$ |
+| 2 | $$0.4102$$ | $$0.8630$$ | $$0.5197$$ | $$0.1955$$ | $$0.1812$$ |
+
+Iterating to a tolerance of $$10^{-7}$$ converges after 368 iterations to
+
+$$
+y = 0.7500x^2 + 0.0500x + 0.5500, \qquad \text{MSE} = 0.0125
+\tag{13}\label{eq:parabola_fit}
+$$
+
+The quadratic reduces the error by a factor of 46 against the linear fit
+of eq. $$\eqref{eq:line_fit}$$, but takes an order of magnitude more
+iterations to converge.
+
+![Final parabola fit](method4/fig_parabola_final.png)
+
+*The converged parabola against the four data points.*
+
+![All parabola iterations](method4/fig_parabola_iterations.png)
+
+*Every iterate, shaded light to dark, collapsing onto the final fit.*
+
+![Parabola MSE per epoch](method4/fig_parabola_mse.png)
+
+*Mean squared error per epoch, flattening at $$0.0125$$.*
+
+The complete implementation is listed below, and is also available on
+[GitHub](https://github.com/billylin609/billylin609.github.io/blob/main/SYDE572/assignment1/part4.py).
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from numpy.polynomial import Polynomial
+from pathlib import Path
+
+def line_fitting(x, y, initial_guess, dm, ddm, db, ddb, tolerance=1e-7, max_iter=1000):
+  m, b = initial_guess
+  history, mses = [], []
+  for i in range(max_iter):
+    m_new = m - dm(m, b)/ddm(m, b)
+    b_new = b - db(m_new, b)/ddb(m_new, b)
+    step = np.linalg.norm([m_new - m, b_new - b])
+    mse = np.mean((m_new*x + b_new - y)**2)
+    history.append(np.array([b_new, m_new]))
+    mses.append(mse)
+    if i <= 2:
+      print(f'epoch: {i}, m: {m_new:.6f}, b: {b_new:.6f}, '
+            f'norm: {step:.3e}, MSE: {mse:.6f}')
+    m = m_new
+    b = b_new
+    if step < tolerance:
+      break
+  print(f'Result: y = {m:.4f}x + {b:.4f}, '
+        f'MSE = {np.mean((m*x + b - y)**2):.6f}')
+  return m, b, history, mses
+
+def parabola_fitting(x, y, initial_guess, da, dda, db, ddb, dc, ddc,
+    tolerance=1e-7, max_iter=1000):
+  a, b, c = initial_guess
+  history, mses = [], []
+  for i in range(max_iter):
+    a_new = a - da(a, b, c)/dda(a, b, c)
+    b_new = b - db(a_new, b, c)/ddb(a_new, b, c)
+    c_new = c - dc(a_new, b_new, c)/ddc(a_new, b_new, c)
+    step = np.linalg.norm([a_new - a, b_new - b, c_new - c])
+    mse = np.mean((a_new*x**2 + b_new*x + c_new - y)**2)
+    history.append(np.array([c_new, b_new, a_new]))
+    mses.append(mse)
+    if i <= 2:
+      print(f'epoch: {i}, a: {a_new:.6f}, b: {b_new:.6f}, c: {c_new:.6f}, '
+            f'norm: {step:.3e}, MSE: {mse:.6f}')
+    a = a_new
+    b = b_new
+    c = c_new
+    if step < tolerance:
+      break
+  print(f'Result: y = {a:.4f}x^2 + {b:.4f}x + {c:.4f}, '
+        f'MSE = {np.mean((a*x**2 + b*x + c - y)**2):.6f}')
+  return a, b, c, history, mses
+
+x_0 = np.array([0., 2., 1., 3.])
+y_0 = np.array([0.5, 3.5, 1.5, 7.5])
+
+initial_guess = (1., 1.)
+
+# D(m, b) = sum (m*x + b - y)^2, differentiated once and twice in each
+# parameter separately
+residual = lambda m, b: m*x_0 + b - y_0
+dm  = lambda m, b: 2 * np.sum(x_0 * residual(m, b))
+ddm = lambda m, b: 2 * np.sum(x_0**2)
+db  = lambda m, b: 2 * np.sum(residual(m, b))
+ddb = lambda m, b: 2 * len(x_0)
+
+m, b, line_hist, line_mses = line_fitting(
+    x_0, y_0, initial_guess, dm, ddm, db, ddb)
+
+# D(a, b, c) = sum (a*x^2 + b*x + c - y)^2, same coordinate-wise scheme
+parabola_initial_guess = (1., 1., 1.)
+parabola_residual = lambda a, b, c: a*x_0**2 + b*x_0 + c - y_0
+da  = lambda a, b, c: 2 * np.sum(x_0**2 * parabola_residual(a, b, c))
+dda = lambda a, b, c: 2 * np.sum(x_0**4)
+db2 = lambda a, b, c: 2 * np.sum(x_0 * parabola_residual(a, b, c))
+ddb2 = lambda a, b, c: 2 * np.sum(x_0**2)
+dc  = lambda a, b, c: 2 * np.sum(parabola_residual(a, b, c))
+ddc = lambda a, b, c: 2 * len(x_0)
+
+a, b, c, par_hist, par_mses = parabola_fitting(
+    x_0, y_0, parabola_initial_guess, da, dda, db2, ddb2, dc, ddc)
+```
+
+
+## Appendix A: Hand Calculations
+
+![Hand calculation page 1](figs/handwritten/IMG_5444.jpg)
+
+![Hand calculation page 2](figs/handwritten/IMG_5445.jpg)
+
+![Hand calculation page 3](figs/handwritten/IMG_5446.jpg)
+
+![Hand calculation page 4](figs/handwritten/IMG_5447.jpg)
+
+![Hand calculation page 5](figs/handwritten/IMG_5448.jpg)
+
+![Hand calculation page 6](figs/handwritten/IMG_5449.jpg)
+
+![Hand calculation page 7](figs/handwritten/IMG_5450.jpg)
+
+![Hand calculation page 8](figs/handwritten/IMG_5451.jpg)
+
+![Hand calculation page 9](figs/handwritten/IMG_5452.jpg)
+
+![Hand calculation page 10](figs/handwritten/IMG_5453.jpg)
+
+![Hand calculation page 11](figs/handwritten/IMG_5454.jpg)
+
+![Hand calculation page 12](figs/handwritten/IMG_5455.jpg)
+
+![Hand calculation page 13](figs/handwritten/IMG_5456.jpg)
+
+![Hand calculation page 14](figs/handwritten/IMG_5457.jpg)
