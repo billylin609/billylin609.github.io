@@ -1,8 +1,12 @@
+# Quarto build output
 _site/
-.jekyll-cache/
-.sass-cache/
+.quarto/
+**/*.quarto_ipynb
 
+# Python
 .venv/
 __pycache__/
 
 *.lock
+
+/.quarto/

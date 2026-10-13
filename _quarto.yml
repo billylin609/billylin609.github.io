@@ -1,0 +1,37 @@
+project:
+  type: website
+  output-dir: _site
+  render:
+    - index.qmd
+    - SYDE572/**/*.qmd
+
+website:
+  title: "Yuchen"
+  description: "Systems Design Engineering @ UWaterloo"
+  site-url: "https://billylin609.github.io"
+  repo-url: "https://github.com/billylin609/billylin609.github.io"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+    right:
+      - text: "Source"
+        href: "https://github.com/billylin609/billylin609.github.io"
+      - icon: github
+        href: "https://github.com/billylin609"
+        aria-label: "GitHub profile"
+  page-footer:
+    center: "Built with Quarto"
+
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    toc: true
+    toc-location: left
+    toc-depth: 3
+    toc-title: "On this page"
+    html-math-method: mathjax
+    code-overflow: scroll
+    highlight-style: github
+    link-external-newwindow: true

@@ -1,14 +1,9 @@
 ---
-layout: default
-title: SYDE 572 — Assignment 1
-course: SYDE 572 · Assignment 1
+title: "Assignment 1"
+subtitle: "SYDE 572 · Assignment 1"
+author: "Yuchen Lin"
 date: 2026-09-29
 ---
-
-# Assignment 1
-
-> Author: Yuchen Lin \\
-> Date: 2026-09-29
 
 ## Part 1:
 
@@ -36,12 +31,10 @@ $$
 D = (x-x_0)^2+\left[(x^2+5)-y_0\right]^2 \tag{1}\label{eq:objective}
 $$
 
-$$
 \begin{align}
   \frac{dD}{dx} &= 2(x-x_0) + 2\left[(x^2+5)-y_0\right]\times (2x) \\
                 &= 2(x-x_0) + 4x(x^2 + 5 - y_0) \tag{2}\label{eq:first_order}
 \end{align}
-$$
 
 Step 2: Substitute point of interested and set $\frac{dD}{dx}=0$
 
@@ -49,34 +42,32 @@ $$
 (x_0, y_0) = (0, 0) \tag{3}\label{eq:init_point}
 $$
 
-Substitute eq. $$\eqref{eq:init_point}$$ into eq. $$\eqref{eq:first_order}$$:
+Substitute eq. $\eqref{eq:init_point}$ into eq. $\eqref{eq:first_order}$:
 
-$$
 \begin{align}
   0 &= 2x + 4x\left[x^2 + 5\right] \\
     &= 4x^3 + 22x \\
     &= 2x(2x^2+11) \tag{4}\label{eq:soln_a}
 \end{align}
-$$
 
-According to eq. $$\eqref{eq:soln_a}$$, there are two possible
+According to eq. $\eqref{eq:soln_a}$, there are two possible
 solutions for the given equation: $2x=0$ or $2x^2+11=0$.
 
 Since $2x^2+11>0 \quad \forall x \in \mathbb{R}$, the second
-factor has no real root, so $$x=0$$ is the only critical point.
+factor has no real root, so $x=0$ is the only critical point.
 The closest point on the curve is therefore
-$$\left(0, f(0)\right) = (0, 5)$$, at a distance of $$d=5$$.
+$\left(0, f(0)\right) = (0, 5)$, at a distance of $d=5$.
 
 The rest of the solution will be listed in table form and hand
 calculation will be found in appendix A.
 
-| Point $$(x_0, y_0)$$ | Critical eq. $$D'(x)=0$$ | Closest $$x^*$$ | Closest point | Distance $$d$$ |
+| Point $(x_0, y_0)$ | Critical eq. $D'(x)=0$ | Closest $x^*$ | Closest point | Distance $d$ |
 | :--- | :--- | ---: | :---: | ---: |
-| $$(0, 0)$$  | $$4x^3 + 22x = 0$$      | $$0.0000$$  | $$(0.0000,\ 5.0000)$$  | $$5.0000$$ |
-| $$(-4, 0)$$ | $$4x^3 + 22x + 8 = 0$$  | $$-0.3555$$ | $$(-0.3555,\ 5.1264)$$ | $$6.2898$$ |
-| $$(-8, 0)$$ | $$4x^3 + 22x + 16 = 0$$ | $$-0.6721$$ | $$(-0.6721,\ 5.4517)$$ | $$9.1334$$ |
-| $$(2, 0)$$  | $$4x^3 + 22x - 4 = 0$$  | $$0.1807$$  | $$(0.1807,\ 5.0327)$$  | $$5.3514$$ |
-| $$(6, 0)$$  | $$4x^3 + 22x - 12 = 0$$ | $$0.5199$$  | $$(0.5199,\ 5.2703)$$  | $$7.6031$$ |
+| $(0, 0)$  | $4x^3 + 22x = 0$      | $0.0000$  | $(0.0000,\ 5.0000)$  | $5.0000$ |
+| $(-4, 0)$ | $4x^3 + 22x + 8 = 0$  | $-0.3555$ | $(-0.3555,\ 5.1264)$ | $6.2898$ |
+| $(-8, 0)$ | $4x^3 + 22x + 16 = 0$ | $-0.6721$ | $(-0.6721,\ 5.4517)$ | $9.1334$ |
+| $(2, 0)$  | $4x^3 + 22x - 4 = 0$  | $0.1807$  | $(0.1807,\ 5.0327)$  | $5.3514$ |
+| $(6, 0)$  | $4x^3 + 22x - 12 = 0$ | $0.5199$  | $(0.5199,\ 5.2703)$  | $7.6031$ |
 
 Each cubic has exactly one real root, so the critical point is
 unique in every case and no comparison between candidates is
@@ -89,12 +80,10 @@ second order derivative. The original and the first order of
 the objective function is available at eq. \ref{eq:objective},
 eq. \ref{eq:first_order}.
 
-$$
 \begin{align}
   \frac{d^2D}{dx^2} &= 2 + 12x^2 + 20 -4y_0 \\
                     &= 12x^2 + 22 - 4y_0 \tag{5}\label{eq:second_order}
 \end{align}
-$$
 
 For point $(0, 0)$, our initial guess start at $x=1$. We
 will demonstrate solving it manually by following the
@@ -117,12 +106,10 @@ $$
 
 Update the next guess:
 
-$$
 \begin{align}
   x &= 1 - \frac{D'(1)}{D''(1)} \\
     &= \frac{4}{17}
 \end{align}
-$$
 
 **Second Iteration(Using New Guess from Prev iteration)**
 
@@ -140,12 +127,10 @@ $$
 
 Update the next Guess:
 
-$$
 \begin{align}
   x &= \frac{4}{17} - \frac{D'(\frac{4}{17})}{D''(\frac{4}{17})} \\
     &= 4.598 \times 10^{-3}
 \end{align}
-$$
 
 Using the result from the second iteration, we could compute
 the shortest from the point to the function.
@@ -157,78 +142,78 @@ $$
 Compute three iteration for all the points and the results are
 summarized below.
 
-**Point $$(0, 0)$$, initial guess $$x=1$$**
+**Point $(0, 0)$, initial guess $x=1$**
 
-| Iteration | $$x$$ | $$D'(x)$$ | $$D''(x)$$ | Distance $$d(x)$$ |
+| Iteration | $x$ | $D'(x)$ | $D''(x)$ | Distance $d(x)$ |
 | :--- | ---: | ---: | ---: | ---: |
-| First | $$1.000$$ | $$26.000$$ | $$34.000$$ | $$6.083$$ |
-| Second | $$0.235$$ | $$5.229$$ | $$22.664$$ | $$5.061$$ |
-| Third | $$0.005$$ | $$0.101$$ | $$22.000$$ | $$5.000$$ |
+| First | $1.000$ | $26.000$ | $34.000$ | $6.083$ |
+| Second | $0.235$ | $5.229$ | $22.664$ | $5.061$ |
+| Third | $0.005$ | $0.101$ | $22.000$ | $5.000$ |
 
-**Point $$(-4, 0)$$, initial guess $$x=0$$**
+**Point $(-4, 0)$, initial guess $x=0$**
 
-| Iteration | $$x$$ | $$D'(x)$$ | $$D''(x)$$ | Distance $$d(x)$$ |
+| Iteration | $x$ | $D'(x)$ | $D''(x)$ | Distance $d(x)$ |
 | :--- | ---: | ---: | ---: | ---: |
-| First | $$0.000$$ | $$8.000$$ | $$22.000$$ | $$6.403$$ |
-| Second | $$-0.364$$ | $$-0.192$$ | $$23.587$$ | $$6.290$$ |
-| Third | $$-0.355$$ | $$0.000$$ | $$23.516$$ | $$6.290$$ |
+| First | $0.000$ | $8.000$ | $22.000$ | $6.403$ |
+| Second | $-0.364$ | $-0.192$ | $23.587$ | $6.290$ |
+| Third | $-0.355$ | $0.000$ | $23.516$ | $6.290$ |
 
-**Point $$(-8, 0)$$, initial guess $$x=0$$**
+**Point $(-8, 0)$, initial guess $x=0$**
 
-| Iteration | $$x$$ | $$D'(x)$$ | $$D''(x)$$ | Distance $$d(x)$$ |
+| Iteration | $x$ | $D'(x)$ | $D''(x)$ | Distance $d(x)$ |
 | :--- | ---: | ---: | ---: | ---: |
-| First | $$0.000$$ | $$16.000$$ | $$22.000$$ | $$9.434$$ |
-| Second | $$-0.727$$ | $$-1.539$$ | $$28.347$$ | $$9.136$$ |
-| Third | $$-0.673$$ | $$-0.025$$ | $$27.435$$ | $$9.133$$ |
+| First | $0.000$ | $16.000$ | $22.000$ | $9.434$ |
+| Second | $-0.727$ | $-1.539$ | $28.347$ | $9.136$ |
+| Third | $-0.673$ | $-0.025$ | $27.435$ | $9.133$ |
 
-**Point $$(2, 0)$$, initial guess $$x=0$$**
+**Point $(2, 0)$, initial guess $x=0$**
 
-| Iteration | $$x$$ | $$D'(x)$$ | $$D''(x)$$ | Distance $$d(x)$$ |
+| Iteration | $x$ | $D'(x)$ | $D''(x)$ | Distance $d(x)$ |
 | :--- | ---: | ---: | ---: | ---: |
-| First | $$0.000$$ | $$-4.000$$ | $$22.000$$ | $$5.385$$ |
-| Second | $$0.182$$ | $$0.024$$ | $$22.397$$ | $$5.351$$ |
-| Third | $$0.181$$ | $$0.000$$ | $$22.392$$ | $$5.351$$ |
+| First | $0.000$ | $-4.000$ | $22.000$ | $5.385$ |
+| Second | $0.182$ | $0.024$ | $22.397$ | $5.351$ |
+| Third | $0.181$ | $0.000$ | $22.392$ | $5.351$ |
 
-**Point $$(6, 0)$$, initial guess $$x=0$$**
+**Point $(6, 0)$, initial guess $x=0$**
 
-| Iteration | $$x$$ | $$D'(x)$$ | $$D''(x)$$ | Distance $$d(x)$$ |
+| Iteration | $x$ | $D'(x)$ | $D''(x)$ | Distance $d(x)$ |
 | :--- | ---: | ---: | ---: | ---: |
-| First | $$0.000$$ | $$-12.000$$ | $$22.000$$ | $$7.810$$ |
-| Second | $$0.545$$ | $$0.649$$ | $$25.570$$ | $$7.604$$ |
-| Third | $$0.520$$ | $$0.004$$ | $$25.246$$ | $$7.603$$ |
+| First | $0.000$ | $-12.000$ | $22.000$ | $7.810$ |
+| Second | $0.545$ | $0.649$ | $25.570$ | $7.604$ |
+| Third | $0.520$ | $0.004$ | $25.246$ | $7.603$ |
 
 #### Converging Results from Python Script
 
 A Python script iterates the algorithm to convergence, stopping
-once the step size falls below a tolerance of $$10^{-7}$$.
+once the step size falls below a tolerance of $10^{-7}$.
 
-| Point $$(x_0, y_0)$$ | Best $$x^*$$ | Closest point | Distance $$d$$ |
+| Point $(x_0, y_0)$ | Best $x^*$ | Closest point | Distance $d$ |
 | :--- | ---: | :---: | ---: |
-| $$(0, 0)$$  | $$0.0000$$  | $$(0.0000,\ 5.0000)$$  | $$5.0000$$ |
-| $$(-4, 0)$$ | $$-0.3555$$ | $$(-0.3555,\ 5.1264)$$ | $$6.2898$$ |
-| $$(-8, 0)$$ | $$-0.6721$$ | $$(-0.6721,\ 5.4517)$$ | $$9.1334$$ |
-| $$(2, 0)$$  | $$0.1807$$  | $$(0.1807,\ 5.0327)$$  | $$5.3514$$ |
-| $$(6, 0)$$  | $$0.5199$$  | $$(0.5199,\ 5.2703)$$  | $$7.6031$$ |
+| $(0, 0)$  | $0.0000$  | $(0.0000,\ 5.0000)$  | $5.0000$ |
+| $(-4, 0)$ | $-0.3555$ | $(-0.3555,\ 5.1264)$ | $6.2898$ |
+| $(-8, 0)$ | $-0.6721$ | $(-0.6721,\ 5.4517)$ | $9.1334$ |
+| $(2, 0)$  | $0.1807$  | $(0.1807,\ 5.0327)$  | $5.3514$ |
+| $(6, 0)$  | $0.5199$  | $(0.5199,\ 5.2703)$  | $7.6031$ |
 
 ![Shortest distance from (0, 0)](method1/fig_point_0.000_0.000_init_1.000.png)
 
-*Point $$(0,0)$$ — closest point $$(0.0000,\ 5.0000)$$, $$d=5.0000$$.*
+*Point $(0,0)$ — closest point $(0.0000,\ 5.0000)$, $d=5.0000$.*
 
 ![Shortest distance from (-4, 0)](method1/fig_point_-4.000_0.000_init_0.000.png)
 
-*Point $$(-4,0)$$ — closest point $$(-0.3555,\ 5.1264)$$, $$d=6.2898$$.*
+*Point $(-4,0)$ — closest point $(-0.3555,\ 5.1264)$, $d=6.2898$.*
 
 ![Shortest distance from (-8, 0)](method1/fig_point_-8.000_0.000_init_0.000.png)
 
-*Point $$(-8,0)$$ — closest point $$(-0.6721,\ 5.4517)$$, $$d=9.1334$$.*
+*Point $(-8,0)$ — closest point $(-0.6721,\ 5.4517)$, $d=9.1334$.*
 
 ![Shortest distance from (2, 0)](method1/fig_point_2.000_0.000_init_0.000.png)
 
-*Point $$(2,0)$$ — closest point $$(0.1807,\ 5.0327)$$, $$d=5.3514$$.*
+*Point $(2,0)$ — closest point $(0.1807,\ 5.0327)$, $d=5.3514$.*
 
 ![Shortest distance from (6, 0)](method1/fig_point_6.000_0.000_init_0.000.png)
 
-*Point $$(6,0)$$ — closest point $$(0.5199,\ 5.2703)$$, $$d=7.6031$$.*
+*Point $(6,0)$ — closest point $(0.5199,\ 5.2703)$, $d=7.6031$.*
 
 The complete implementation is listed below, and is also
 available on
@@ -325,7 +310,7 @@ Range: $[-1, 1]$
 
 Initial Point: $(0, 0)$
 
-$$\phi = \frac{1+\sqrt{5}}{2} = 1.618$$
+$\phi = \frac{1+\sqrt{5}}{2} = 1.618$
 
 $\phi^{-1}$: $2-\phi = 0.382$
 
@@ -341,13 +326,13 @@ $$
 x_2= b - \phi^{-1}\times (b-a) \tag{7}\label{eq:update_x2}
 $$
 
-Objective distance function is computed using eq. $$\eqref{eq:objective}$$.
+Objective distance function is computed using eq. $\eqref{eq:objective}$.
 
 Before start of iteration 1, the parameter are listed as following.
 
-| $$a$$ | $$b$$ | $$x_1$$ | $$x_2$$ | $$D(x_1)$$ | $$D(x_2)$$ |
+| $a$ | $b$ | $x_1$ | $x_2$ | $D(x_1)$ | $D(x_2)$ |
 | ---: | ---: | ---: | ---: | ---: | ---: |
-| $$-1.000$$ | $$1.000$$ | $$-0.236$$ | $$0.236$$ | $$25.616$$ | $$25.616$$ |
+| $-1.000$ | $1.000$ | $-0.236$ | $0.236$ | $25.616$ | $25.616$ |
 
 **Iteration 1**
 
@@ -362,15 +347,15 @@ D(x_1) = D(x_2)
 $$
 
 The first condition keeps the loop running. The second makes the strict
-test $$D(x_1) < D(x_2)$$ fail, so the algorithm takes the `else` branch.
-That branch discards the left portion of the interval: it assigns $$a
-\leftarrow x_1$$, carries $$x_2$$ and $$D(x_2)$$ over into $$x_1$$ and
-$$D(x_1)$$, and recomputes only $$x_2$$ and $$D(x_2)$$ from
-eq. $$\eqref{eq:update_x2}$$. Result is summarized in the following table:
+test $D(x_1) < D(x_2)$ fail, so the algorithm takes the `else` branch.
+That branch discards the left portion of the interval: it assigns $a
+\leftarrow x_1$, carries $x_2$ and $D(x_2)$ over into $x_1$ and
+$D(x_1)$, and recomputes only $x_2$ and $D(x_2)$ from
+eq. $\eqref{eq:update_x2}$. Result is summarized in the following table:
 
-| $$a$$ | $$b$$ | $$x_1$$ | $$x_2$$ | $$D(x_1)$$ | $$D(x_2)$$ |
+| $a$ | $b$ | $x_1$ | $x_2$ | $D(x_1)$ | $D(x_2)$ |
 | ---: | ---: | ---: | ---: | ---: | ---: |
-| $$-0.236$$ | $$1.000$$ | $$0.236$$ | $$0.528$$ | $$25.616$$ | $$28.143$$ |
+| $-0.236$ | $1.000$ | $0.236$ | $0.528$ | $25.616$ | $28.143$ |
 
 **Iteration 2:**
 
@@ -385,12 +370,12 @@ D(x_1) < D(x_2)
 $$
 
 The test now holds, so the algorithm takes the `if` branch: it assigns
-$$b \leftarrow x_2$$, carries $$x_1$$ into $$x_2$$, and recomputes only
-$$x_1$$ from eq. $$\eqref{eq:update_x1}$$.
+$b \leftarrow x_2$, carries $x_1$ into $x_2$, and recomputes only
+$x_1$ from eq. $\eqref{eq:update_x1}$.
 
-| $$a$$ | $$b$$ | $$x_1$$ | $$x_2$$ | $$D(x_1)$$ | $$D(x_2)$$ |
+| $a$ | $b$ | $x_1$ | $x_2$ | $D(x_1)$ | $D(x_2)$ |
 | ---: | ---: | ---: | ---: | ---: | ---: |
-| $$-0.236$$ | $$0.528$$ | $$0.056$$ | $$0.236$$ | $$25.034$$ | $$25.616$$ |
+| $-0.236$ | $0.528$ | $0.056$ | $0.236$ | $25.034$ | $25.616$ |
 
 **Iteration 3**
 
@@ -405,116 +390,116 @@ D(x_1) < D(x_2)
 $$
 
 The algorithm takes the `if` branch again: it assigns
-$$b \leftarrow x_2$$, carries $$x_1$$ into $$x_2$$, and recomputes only
-$$x_1$$ from eq. $$\eqref{eq:update_x1}$$.
+$b \leftarrow x_2$, carries $x_1$ into $x_2$, and recomputes only
+$x_1$ from eq. $\eqref{eq:update_x1}$.
 
-| $$a$$ | $$b$$ | $$x_1$$ | $$x_2$$ | $$D(x_1)$$ | $$D(x_2)$$ |
+| $a$ | $b$ | $x_1$ | $x_2$ | $D(x_1)$ | $D(x_2)$ |
 | ---: | ---: | ---: | ---: | ---: | ---: |
-| $$-0.236$$ | $$0.236$$ | $$-0.056$$ | $$0.056$$ | $$25.034$$ | $$25.034$$ |
+| $-0.236$ | $0.236$ | $-0.056$ | $0.056$ | $25.034$ | $25.034$ |
 
 The final estimate is the midpoint of the bracket,
-$$\frac{-0.236 + 0.236}{2} = 0$$, giving a distance of $$d = 5$$ — the
+$\frac{-0.236 + 0.236}{2} = 0$, giving a distance of $d = 5$ — the
 same result as both earlier methods.
 
 Here is the summary of three iteration for all methods.
 
-**Point $$(0, 0)$$, bracket $$[-1, 1]$$**
+**Point $(0, 0)$, bracket $[-1, 1]$**
 
-| Iteration | $$a$$ | $$b$$ | $$x_1$$ | $$x_2$$ | $$D(x_1)$$ | $$D(x_2)$$ |
+| Iteration | $a$ | $b$ | $x_1$ | $x_2$ | $D(x_1)$ | $D(x_2)$ |
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: |
-| 0 | $$-1.000$$ | $$1.000$$ | $$-0.236$$ | $$0.236$$ | $$25.616$$ | $$25.616$$ |
-| 1 | $$-0.236$$ | $$1.000$$ | $$0.236$$ | $$0.528$$ | $$25.616$$ | $$28.143$$ |
-| 2 | $$-0.236$$ | $$0.528$$ | $$0.056$$ | $$0.236$$ | $$25.034$$ | $$25.616$$ |
-| 3 | $$-0.236$$ | $$0.236$$ | $$-0.056$$ | $$0.056$$ | $$25.034$$ | $$25.034$$ |
+| 0 | $-1.000$ | $1.000$ | $-0.236$ | $0.236$ | $25.616$ | $25.616$ |
+| 1 | $-0.236$ | $1.000$ | $0.236$ | $0.528$ | $25.616$ | $28.143$ |
+| 2 | $-0.236$ | $0.528$ | $0.056$ | $0.236$ | $25.034$ | $25.616$ |
+| 3 | $-0.236$ | $0.236$ | $-0.056$ | $0.056$ | $25.034$ | $25.034$ |
 
-Midpoint $$0.000$$, closest point $$(0.000,\ 5.000)$$, distance
-$$d = 5.000$$.
+Midpoint $0.000$, closest point $(0.000,\ 5.000)$, distance
+$d = 5.000$.
 
-**Point $$(-4, 0)$$, bracket $$[-1, 1]$$**
+**Point $(-4, 0)$, bracket $[-1, 1]$**
 
-| Iteration | $$a$$ | $$b$$ | $$x_1$$ | $$x_2$$ | $$D(x_1)$$ | $$D(x_2)$$ |
+| Iteration | $a$ | $b$ | $x_1$ | $x_2$ | $D(x_1)$ | $D(x_2)$ |
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: |
-| 0 | $$-1.000$$ | $$1.000$$ | $$-0.236$$ | $$0.236$$ | $$39.728$$ | $$43.505$$ |
-| 1 | $$-1.000$$ | $$0.236$$ | $$-0.528$$ | $$-0.236$$ | $$39.920$$ | $$39.728$$ |
-| 2 | $$-0.528$$ | $$0.236$$ | $$-0.236$$ | $$-0.056$$ | $$39.728$$ | $$40.588$$ |
-| 3 | $$-0.528$$ | $$-0.056$$ | $$-0.348$$ | $$-0.236$$ | $$39.563$$ | $$39.728$$ |
+| 0 | $-1.000$ | $1.000$ | $-0.236$ | $0.236$ | $39.728$ | $43.505$ |
+| 1 | $-1.000$ | $0.236$ | $-0.528$ | $-0.236$ | $39.920$ | $39.728$ |
+| 2 | $-0.528$ | $0.236$ | $-0.236$ | $-0.056$ | $39.728$ | $40.588$ |
+| 3 | $-0.528$ | $-0.056$ | $-0.348$ | $-0.236$ | $39.563$ | $39.728$ |
 
-Midpoint $$-0.292$$, closest point $$(-0.292,\ 5.085)$$, distance
-$$d = 6.294$$.
+Midpoint $-0.292$, closest point $(-0.292,\ 5.085)$, distance
+$d = 6.294$.
 
-**Point $$(-8, 0)$$, bracket $$[-1, 1]$$**
+**Point $(-8, 0)$, bracket $[-1, 1]$**
 
-| Iteration | $$a$$ | $$b$$ | $$x_1$$ | $$x_2$$ | $$D(x_1)$$ | $$D(x_2)$$ |
+| Iteration | $a$ | $b$ | $x_1$ | $x_2$ | $D(x_1)$ | $D(x_2)$ |
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: |
-| 0 | $$-1.000$$ | $$1.000$$ | $$-0.236$$ | $$0.236$$ | $$85.839$$ | $$93.393$$ |
-| 1 | $$-1.000$$ | $$0.236$$ | $$-0.528$$ | $$-0.236$$ | $$83.697$$ | $$85.839$$ |
-| 2 | $$-1.000$$ | $$-0.236$$ | $$-0.708$$ | $$-0.528$$ | $$83.437$$ | $$83.697$$ |
-| 3 | $$-1.000$$ | $$-0.528$$ | $$-0.820$$ | $$-0.708$$ | $$83.727$$ | $$83.437$$ |
+| 0 | $-1.000$ | $1.000$ | $-0.236$ | $0.236$ | $85.839$ | $93.393$ |
+| 1 | $-1.000$ | $0.236$ | $-0.528$ | $-0.236$ | $83.697$ | $85.839$ |
+| 2 | $-1.000$ | $-0.236$ | $-0.708$ | $-0.528$ | $83.437$ | $83.697$ |
+| 3 | $-1.000$ | $-0.528$ | $-0.820$ | $-0.708$ | $83.727$ | $83.437$ |
 
-Midpoint $$-0.764$$, closest point $$(-0.764,\ 5.584)$$, distance
-$$d = 9.140$$.
+Midpoint $-0.764$, closest point $(-0.764,\ 5.584)$, distance
+$d = 9.140$.
 
-**Point $$(2, 0)$$, bracket $$[-1, 1]$$**
+**Point $(2, 0)$, bracket $[-1, 1]$**
 
-| Iteration | $$a$$ | $$b$$ | $$x_1$$ | $$x_2$$ | $$D(x_1)$$ | $$D(x_2)$$ |
+| Iteration | $a$ | $b$ | $x_1$ | $x_2$ | $D(x_1)$ | $D(x_2)$ |
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: |
-| 0 | $$-1.000$$ | $$1.000$$ | $$-0.236$$ | $$0.236$$ | $$30.560$$ | $$28.672$$ |
-| 1 | $$-0.236$$ | $$1.000$$ | $$0.236$$ | $$0.528$$ | $$28.672$$ | $$30.031$$ |
-| 2 | $$-0.236$$ | $$0.528$$ | $$0.056$$ | $$0.236$$ | $$28.811$$ | $$28.672$$ |
-| 3 | $$0.056$$ | $$0.528$$ | $$0.236$$ | $$0.348$$ | $$28.672$$ | $$28.953$$ |
+| 0 | $-1.000$ | $1.000$ | $-0.236$ | $0.236$ | $30.560$ | $28.672$ |
+| 1 | $-0.236$ | $1.000$ | $0.236$ | $0.528$ | $28.672$ | $30.031$ |
+| 2 | $-0.236$ | $0.528$ | $0.056$ | $0.236$ | $28.811$ | $28.672$ |
+| 3 | $0.056$ | $0.528$ | $0.236$ | $0.348$ | $28.672$ | $28.953$ |
 
-Midpoint $$0.292$$, closest point $$(0.292,\ 5.085)$$, distance
-$$d = 5.364$$.
+Midpoint $0.292$, closest point $(0.292,\ 5.085)$, distance
+$d = 5.364$.
 
-**Point $$(6, 0)$$, bracket $$[-1, 1]$$**
+**Point $(6, 0)$, bracket $[-1, 1]$**
 
-| Iteration | $$a$$ | $$b$$ | $$x_1$$ | $$x_2$$ | $$D(x_1)$$ | $$D(x_2)$$ |
+| Iteration | $a$ | $b$ | $x_1$ | $x_2$ | $D(x_1)$ | $D(x_2)$ |
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: |
-| 0 | $$-1.000$$ | $$1.000$$ | $$-0.236$$ | $$0.236$$ | $$64.449$$ | $$58.783$$ |
-| 1 | $$-0.236$$ | $$1.000$$ | $$0.236$$ | $$0.528$$ | $$58.783$$ | $$57.808$$ |
-| 2 | $$0.236$$ | $$1.000$$ | $$0.528$$ | $$0.708$$ | $$57.808$$ | $$58.270$$ |
-| 3 | $$0.236$$ | $$0.708$$ | $$0.416$$ | $$0.528$$ | $$57.941$$ | $$57.808$$ |
+| 0 | $-1.000$ | $1.000$ | $-0.236$ | $0.236$ | $64.449$ | $58.783$ |
+| 1 | $-0.236$ | $1.000$ | $0.236$ | $0.528$ | $58.783$ | $57.808$ |
+| 2 | $0.236$ | $1.000$ | $0.528$ | $0.708$ | $57.808$ | $58.270$ |
+| 3 | $0.236$ | $0.708$ | $0.416$ | $0.528$ | $57.941$ | $57.808$ |
 
-Midpoint $$0.472$$, closest point $$(0.472,\ 5.223)$$, distance
-$$d = 7.605$$.
+Midpoint $0.472$, closest point $(0.472,\ 5.223)$, distance
+$d = 7.605$.
 
 #### Converging Results from Python Script
 
 A Python script runs the same search over the wider bracket
-$$[-10, 10]$$, stopping once $$\left| b-a \right|$$ falls below a
-tolerance of $$10^{-7}$$. The converged results for all five points are
+$[-10, 10]$, stopping once $\left| b-a \right|$ falls below a
+tolerance of $10^{-7}$. The converged results for all five points are
 listed below, and match both earlier methods to four decimal places.
 
-| Point $$(x_0, y_0)$$ | Best $$x^*$$ | Closest point | Distance $$d$$ |
+| Point $(x_0, y_0)$ | Best $x^*$ | Closest point | Distance $d$ |
 | :--- | ---: | :---: | ---: |
-| $$(0, 0)$$  | $$0.0000$$  | $$(0.0000,\ 5.0000)$$  | $$5.0000$$ |
-| $$(-4, 0)$$ | $$-0.3555$$ | $$(-0.3555,\ 5.1264)$$ | $$6.2898$$ |
-| $$(-8, 0)$$ | $$-0.6721$$ | $$(-0.6721,\ 5.4517)$$ | $$9.1334$$ |
-| $$(2, 0)$$  | $$0.1807$$  | $$(0.1807,\ 5.0327)$$  | $$5.3514$$ |
-| $$(6, 0)$$  | $$0.5199$$  | $$(0.5199,\ 5.2703)$$  | $$7.6031$$ |
+| $(0, 0)$  | $0.0000$  | $(0.0000,\ 5.0000)$  | $5.0000$ |
+| $(-4, 0)$ | $-0.3555$ | $(-0.3555,\ 5.1264)$ | $6.2898$ |
+| $(-8, 0)$ | $-0.6721$ | $(-0.6721,\ 5.4517)$ | $9.1334$ |
+| $(2, 0)$  | $0.1807$  | $(0.1807,\ 5.0327)$  | $5.3514$ |
+| $(6, 0)$  | $0.5199$  | $(0.5199,\ 5.2703)$  | $7.6031$ |
 
-Each figure below plots the curve $$f(x)=x^2+5$$ and the shortest distance to
+Each figure below plots the curve $f(x)=x^2+5$ and the shortest distance to
 the point.
 
 ![Golden-section result for (0, 0)](method2/fig_point_0.000_0.000_bracket_-10.0_10.0.png)
 
-*Point $$(0,0)$$ — closest point $$(0.0000,\ 5.0000)$$, $$d=5.0000$$.*
+*Point $(0,0)$ — closest point $(0.0000,\ 5.0000)$, $d=5.0000$.*
 
 ![Golden-section result for (-4, 0)](method2/fig_point_-4.000_0.000_bracket_-10.0_10.0.png)
 
-*Point $$(-4,0)$$ — closest point $$(-0.3555,\ 5.1264)$$, $$d=6.2898$$.*
+*Point $(-4,0)$ — closest point $(-0.3555,\ 5.1264)$, $d=6.2898$.*
 
 ![Golden-section result for (-8, 0)](method2/fig_point_-8.000_0.000_bracket_-10.0_10.0.png)
 
-*Point $$(-8,0)$$ — closest point $$(-0.6721,\ 5.4517)$$, $$d=9.1334$$.*
+*Point $(-8,0)$ — closest point $(-0.6721,\ 5.4517)$, $d=9.1334$.*
 
 ![Golden-section result for (2, 0)](method2/fig_point_2.000_0.000_bracket_-10.0_10.0.png)
 
-*Point $$(2,0)$$ — closest point $$(0.1807,\ 5.0327)$$, $$d=5.3514$$.*
+*Point $(2,0)$ — closest point $(0.1807,\ 5.0327)$, $d=5.3514$.*
 
 ![Golden-section result for (6, 0)](method2/fig_point_6.000_0.000_bracket_-10.0_10.0.png)
 
-*Point $$(6,0)$$ — closest point $$(0.5199,\ 5.2703)$$, $$d=7.6031$$.*
+*Point $(6,0)$ — closest point $(0.5199,\ 5.2703)$, $d=7.6031$.*
 
 The complete implementation is listed below, and is also available on
 [GitHub](https://github.com/billylin609/billylin609.github.io/blob/main/SYDE572/assignment1/part2.py).
@@ -581,33 +566,33 @@ there are multiple real solutions and the initial guess is poor.
 
 ![Newton-Raphson converging to a local minimum](method5/fig_point_2.000_10.000_newton_single_init_1.000.png)
 
-*From $$(2, 10)$$ with an initial guess of $$x=1$$, Newton-Raphson
-returns $$x=-2$$ at a distance of $$4.123$$, when the true nearest
-point is at $$x=2.225$$ and a distance of only $$0.230$$.*
+*From $(2, 10)$ with an initial guess of $x=1$, Newton-Raphson
+returns $x=-2$ at a distance of $4.123$, when the true nearest
+point is at $x=2.225$ and a distance of only $0.230$.*
 
 ![Comparison of the two normals and the D(x) landscape](method5/fig_comparison_point_2.000_10.000.png)
 
-*$$D(x)$$ has two local minima, so the method converges to whichever
+*$D(x)$ has two local minima, so the method converges to whichever
 one its initial guess falls nearest. Running it from several starting
 points and keeping the nearest result recovers the true minimum.*
 
 The new algorithm was tested on two further points and works.
 
-| Point $$(x_0, y_0)$$ | $$x^*$$ | Distance $$d$$ |
+| Point $(x_0, y_0)$ | $x^*$ | Distance $d$ |
 | :--- | ---: | ---: |
-| $$(3, 16)$$ | $$3.3096$$ | $$0.3131$$ |
-| $$(-4, 25)$$ | $$-4.4663$$ | $$0.4692$$ |
+| $(3, 16)$ | $3.3096$ | $0.3131$ |
+| $(-4, 25)$ | $-4.4663$ | $0.4692$ |
 
-Nothing in the method is specific to a polynomial — only $$f$$, $$f'$$
-and $$f''$$ are required. The same algorithm was run on an exponential,
+Nothing in the method is specific to a polynomial — only $f$, $f'$
+and $f''$ are required. The same algorithm was run on an exponential,
 a logarithmic and a radical curve, and every result matches a
 brute-force search over the domain.
 
-| Curve | Point $$(x_0, y_0)$$ | Domain | $$x^*$$ | Distance $$d$$ |
+| Curve | Point $(x_0, y_0)$ | Domain | $x^*$ | Distance $d$ |
 | :--- | :--- | :--- | ---: | ---: |
-| $$f(x) = e^x$$ | $$(1, 0)$$ | $$[-4, 2]$$ | $$0.0000$$ | $$1.4142$$ |
-| $$f(x) = \ln x$$ | $$(1, 3)$$ | $$[0.05, 6]$$ | $$2.0858$$ | $$2.5117$$ |
-| $$f(x) = \sqrt{x}$$ | $$(5, 0)$$ | $$[0.01, 8]$$ | $$4.5000$$ | $$2.1794$$ |
+| $f(x) = e^x$ | $(1, 0)$ | $[-4, 2]$ | $0.0000$ | $1.4142$ |
+| $f(x) = \ln x$ | $(1, 3)$ | $[0.05, 6]$ | $2.0858$ | $2.5117$ |
+| $f(x) = \sqrt{x}$ | $(5, 0)$ | $[0.01, 8]$ | $4.5000$ | $2.1794$ |
 
 ![Multi-start result for (3, 16)](method5/fig_point_3.000_16.000_multi_init_5.000.png)
 
@@ -686,7 +671,6 @@ $$
 
 Solve it parts by parts:
 
-$$
 \begin{align}
 A^T \times A &=
 \begin{bmatrix}
@@ -706,9 +690,7 @@ A^T \times A &=
   6 & 4 
 \end{bmatrix}
 \end{align}
-$$
 
-$$
 \begin{align}
   (A^T \times A)^{-1} &= \frac{1}{det{(A^T \times A)}}
   \begin{bmatrix}
@@ -721,9 +703,7 @@ $$
     -0.3 & 0.7
   \end{bmatrix}
 \end{align}
-$$
 
-$$
 \begin{align}
   (A^T \times A)^{-1} \times A^T \times b &=
   \begin{bmatrix}
@@ -746,7 +726,6 @@ $$
     -0.2
   \end{bmatrix}
 \end{align}
-$$
 
 Therefore the line of best fit is $f(x) = 2.3x - 0.2$ with $MSE=0.575$.
 
@@ -796,7 +775,6 @@ $$
 
 Solve it parts by parts:
 
-$$
 \begin{align}
 A^T \times A &=
 \begin{bmatrix}
@@ -818,9 +796,7 @@ A^T \times A &=
   14 & 6 & 4 
 \end{bmatrix}
 \end{align}
-$$
 
-$$
 \begin{align}
   (A^T \times A)^{-1} = 
   \begin{bmatrix}
@@ -829,9 +805,7 @@ $$
     0.25 & -1.05 & 0.95
   \end{bmatrix}
 \end{align}
-$$
 
-$$
 \begin{align}
   (A^T \times A)^{-1} \times A^T \times b &=
   \begin{bmatrix}
@@ -857,7 +831,6 @@ $$
     0.55
   \end{bmatrix}
 \end{align}
-$$
 
 Therefore the line of best fit is $f(x) = 0.75x^2 +0.05x + 0.55$ with $MSE=0.0125$.
 
@@ -874,45 +847,39 @@ first and second order of partial derivative.
 
 Case 1(fix b):
 
-$$
 \begin{align}
   \frac{\partial E}{\partial m} &= \frac{2}{n} \sum(mx_i+b - y_i)\cdot x_i \\
       &= \frac{1}{2} (14m + 6b -31)
 \end{align}
-$$
 
 Case 2(fix m):
 
-$$
 \begin{align}
   \frac{\partial E}{\partial b} &= \frac{2}{n} \sum(mx_i+b - y_i) \\
       &= \frac{1}{2} (6m + 4b - 13)
 \end{align}
-$$
 
-The second order partial derivatives are constant, since $$E$$ is
+The second order partial derivatives are constant, since $E$ is
 quadratic in both coefficients:
 
-$$
 \begin{align}
   \frac{\partial^2 E}{\partial m^2} &= \frac{2}{n} \sum x_i^2 = 7 \\
   \frac{\partial^2 E}{\partial b^2} &= \frac{2}{n} \cdot n = 2
 \end{align}
-$$
 
 Each step function are $m_{new}=m-\frac{14m+6b-31}{14}$ and
 $b_{new} = b - \frac{6m+4b-13}{4}$.
 
-Starting from $$(m, b) = (1, 1)$$ and substituting the updated $$m$$
-into the $$b$$ step, the first two iterations give:
+Starting from $(m, b) = (1, 1)$ and substituting the updated $m$
+into the $b$ step, the first two iterations give:
 
-| Iteration | $$m$$ | $$b$$ | $$\left\|\Delta\right\|$$ | MSE |
+| Iteration | $m$ | $b$ | $\left\|\Delta\right\|$ | MSE |
 | :--- | ---: | ---: | ---: | ---: |
-| 0 (initial) | $$1.0000$$ | $$1.0000$$ | — | $$3.2500$$ |
-| 1 | $$1.7857$$ | $$0.5714$$ | $$0.8950$$ | $$0.9056$$ |
-| 2 | $$1.9694$$ | $$0.2959$$ | $$0.3311$$ | $$0.7116$$ |
+| 0 (initial) | $1.0000$ | $1.0000$ | — | $3.2500$ |
+| 1 | $1.7857$ | $0.5714$ | $0.8950$ | $0.9056$ |
+| 2 | $1.9694$ | $0.2959$ | $0.3311$ | $0.7116$ |
 
-Iterating to a tolerance of $$10^{-7}$$ converges after 36 iterations to
+Iterating to a tolerance of $10^{-7}$ converges after 36 iterations to
 
 $$
 y = 2.3000x - 0.2000, \qquad \text{MSE} = 0.5750 \tag{8}\label{eq:line_fit}
@@ -930,74 +897,64 @@ which matches the analytical least-squares solution of Method 1.
 
 ![Linear MSE per epoch](method4/fig_line_mse.png)
 
-*Mean squared error per epoch, flattening at $$0.5750$$.*
+*Mean squared error per epoch, flattening at $0.5750$.*
 
 **Parabola Function**
 
 Parabola function can be expressed as $y=ax^2+bx+c$. Fix two variable and compute the first and second order of partial derivative.
 
-With $$n=4$$ the required sums are $$\sum x_i = 6$$,
-$$\sum x_i^2 = 14$$, $$\sum x_i^3 = 36$$, $$\sum x_i^4 = 98$$,
-$$\sum y_i = 13$$, $$\sum x_i y_i = 31$$ and $$\sum x_i^2 y_i = 83$$.
+With $n=4$ the required sums are $\sum x_i = 6$,
+$\sum x_i^2 = 14$, $\sum x_i^3 = 36$, $\sum x_i^4 = 98$,
+$\sum y_i = 13$, $\sum x_i y_i = 31$ and $\sum x_i^2 y_i = 83$.
 
-Case 1 (fix $$b$$, $$c$$):
+Case 1 (fix $b$, $c$):
 
-$$
 \begin{align}
   \frac{\partial E}{\partial a} &= \frac{2}{n} \sum\left(ax_i^2+bx_i+c-y_i\right)x_i^2 \\
       &= \frac{1}{2}\left(98a + 36b + 14c - 83\right) 
 \end{align}
-$$
 
-Case 2 (fix $$a$$, $$c$$):
+Case 2 (fix $a$, $c$):
 
-$$
 \begin{align}
   \frac{\partial E}{\partial b} &= \frac{2}{n} \sum\left(ax_i^2+bx_i+c-y_i\right)x_i \\
       &= \frac{1}{2}\left(36a + 14b + 6c - 31\right)
 \end{align}
-$$
 
-Case 3 (fix $$a$$, $$b$$):
+Case 3 (fix $a$, $b$):
 
-$$
 \begin{align}
   \frac{\partial E}{\partial c} &= \frac{2}{n} \sum\left(ax_i^2+bx_i+c-y_i\right) \\
       &= \frac{1}{2}\left(14a + 6b + 4c - 13\right)
 \end{align}
-$$
 
-The second order partial derivatives are constant, since $$E$$ is
+The second order partial derivatives are constant, since $E$ is
 quadratic in every coefficient:
 
-$$
 \begin{align}
   \frac{\partial^2 E}{\partial a^2} &= \frac{2}{n} \sum x_i^4 = 49 \\
   \frac{\partial^2 E}{\partial b^2} &= \frac{2}{n} \sum x_i^2 = 7 \\
   \frac{\partial^2 E}{\partial c^2} &= \frac{2}{n} \cdot n = 2 \tag{12}\label{eq:par_second}
 \end{align}
-$$
 
 Each step function is therefore
 
-$$
 \begin{align}
   a_{new} &= a - \frac{98a + 36b + 14c - 83}{98} \\
   b_{new} &= b - \frac{36a + 14b + 6c - 31}{14} \\
   c_{new} &= c - \frac{14a + 6b + 4c - 13}{4}
 \end{align}
-$$
 
-Starting from $$(a, b, c) = (1, 1, 1)$$ and substituting each updated
+Starting from $(a, b, c) = (1, 1, 1)$ and substituting each updated
 coefficient into the next step, the first two iterations give:
 
-| Iteration | $$a$$ | $$b$$ | $$c$$ | $$\left\|\Delta\right\|$$ | MSE |
+| Iteration | $a$ | $b$ | $c$ | $\left\|\Delta\right\|$ | MSE |
 | :--- | ---: | ---: | ---: | ---: | ---: |
-| 0 (initial) | $$1.0000$$ | $$1.0000$$ | $$1.0000$$ | — | $$11.2500$$ |
-| 1 | $$0.3367$$ | $$0.9198$$ | $$0.6917$$ | $$0.7358$$ | $$0.3544$$ |
-| 2 | $$0.4102$$ | $$0.8630$$ | $$0.5197$$ | $$0.1955$$ | $$0.1812$$ |
+| 0 (initial) | $1.0000$ | $1.0000$ | $1.0000$ | — | $11.2500$ |
+| 1 | $0.3367$ | $0.9198$ | $0.6917$ | $0.7358$ | $0.3544$ |
+| 2 | $0.4102$ | $0.8630$ | $0.5197$ | $0.1955$ | $0.1812$ |
 
-Iterating to a tolerance of $$10^{-7}$$ converges after 368 iterations to
+Iterating to a tolerance of $10^{-7}$ converges after 368 iterations to
 
 $$
 y = 0.7500x^2 + 0.0500x + 0.5500, \qquad \text{MSE} = 0.0125
@@ -1005,7 +962,7 @@ y = 0.7500x^2 + 0.0500x + 0.5500, \qquad \text{MSE} = 0.0125
 $$
 
 The quadratic reduces the error by a factor of 46 against the linear fit
-of eq. $$\eqref{eq:line_fit}$$, but takes an order of magnitude more
+of eq. $\eqref{eq:line_fit}$, but takes an order of magnitude more
 iterations to converge.
 
 ![Final parabola fit](method4/fig_parabola_final.png)
@@ -1018,7 +975,7 @@ iterations to converge.
 
 ![Parabola MSE per epoch](method4/fig_parabola_mse.png)
 
-*Mean squared error per epoch, flattening at $$0.0125$$.*
+*Mean squared error per epoch, flattening at $0.0125$.*
 
 The complete implementation is listed below, and is also available on
 [GitHub](https://github.com/billylin609/billylin609.github.io/blob/main/SYDE572/assignment1/part4.py).
