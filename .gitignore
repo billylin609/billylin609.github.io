@@ -1,12 +1,26 @@
-# Quarto build output
-_site/
-.quarto/
-**/*.quarto_ipynb
+# Astro build output
+dist/
+# generated types
+.astro/
 
-# Python
+# dependencies
+node_modules/
+
+# Python (figure generation scripts)
 .venv/
 __pycache__/
 
+# logs
+npm-debug.log*
+
+.DS_Store
+.idea/
+
+# uv lockfile for the figure-generation scripts
 *.lock
 
-/.quarto/
+# Node Lock file
+package-lock.json
+
+# WSL/Windows artifacts left beside files copied in from Explorer
+*:Zone.Identifier

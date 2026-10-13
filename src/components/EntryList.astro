@@ -1,0 +1,21 @@
+---
+// The row list used by every text listing (coursework, blog, solutions).
+import { href, iso, fmtShort, type Entry } from '../data/entries';
+interface Props { items: Entry[] }
+const { items } = Astro.props;
+---
+
+<ul class="mt-6 border-t border-rule">
+  {items.map((w) => (
+    <li>
+      <a href={href(w)} class="group grid grid-cols-[150px_1fr_auto] max-md:grid-cols-[1fr_auto] gap-x-6 gap-y-1 items-start py-5 border-b border-rule">
+        <time class="text-[13px] text-smoke pt-0.5 max-md:order-2 max-md:col-span-2" datetime={iso(w.data.date)}>{fmtShort(w.data.date)}</time>
+        <span>
+          <span class="block text-[17px] max-md:text-[15px] font-bold tracking-[-0.02em] text-ink group-hover:underline underline-offset-4">{w.data.title}</span>
+          <span class="block mt-2 text-[13px] leading-[1.5] text-steel max-w-[70ch]">{w.data.summary}</span>
+        </span>
+        <span class="text-stone font-bold group-hover:text-ink pt-0.5" aria-hidden="true">-&gt;</span>
+      </a>
+    </li>
+  ))}
+</ul>

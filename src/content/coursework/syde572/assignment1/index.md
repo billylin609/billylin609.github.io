@@ -1,8 +1,10 @@
 ---
 title: "Assignment 1"
-subtitle: "SYDE 572 · Assignment 1"
+category: "Course"
+group: "SYDE 572"
 author: "Yuchen Lin"
 date: 2026-09-29
+summary: "Unconstrained optimization by hand and by iteration: analytical minimization, Newton-Raphson and golden-section search for the shortest distance from a point to a curve, then least-squares line and parabola fitting."
 ---
 
 ## Part 1:
@@ -31,10 +33,12 @@ $$
 D = (x-x_0)^2+\left[(x^2+5)-y_0\right]^2 \tag{1}\label{eq:objective}
 $$
 
+$$
 \begin{align}
   \frac{dD}{dx} &= 2(x-x_0) + 2\left[(x^2+5)-y_0\right]\times (2x) \\
                 &= 2(x-x_0) + 4x(x^2 + 5 - y_0) \tag{2}\label{eq:first_order}
 \end{align}
+$$
 
 Step 2: Substitute point of interested and set $\frac{dD}{dx}=0$
 
@@ -44,11 +48,13 @@ $$
 
 Substitute eq. $\eqref{eq:init_point}$ into eq. $\eqref{eq:first_order}$:
 
+$$
 \begin{align}
   0 &= 2x + 4x\left[x^2 + 5\right] \\
     &= 4x^3 + 22x \\
     &= 2x(2x^2+11) \tag{4}\label{eq:soln_a}
 \end{align}
+$$
 
 According to eq. $\eqref{eq:soln_a}$, there are two possible
 solutions for the given equation: $2x=0$ or $2x^2+11=0$.
@@ -77,13 +83,15 @@ needed.
 
 Newton-Raphson method require both first order derivative and
 second order derivative. The original and the first order of
-the objective function is available at eq. \ref{eq:objective},
-eq. \ref{eq:first_order}.
+the objective function is available at eq. $\ref{eq:objective}$,
+eq. $\ref{eq:first_order}$.
 
+$$
 \begin{align}
   \frac{d^2D}{dx^2} &= 2 + 12x^2 + 20 -4y_0 \\
                     &= 12x^2 + 22 - 4y_0 \tag{5}\label{eq:second_order}
 \end{align}
+$$
 
 For point $(0, 0)$, our initial guess start at $x=1$. We
 will demonstrate solving it manually by following the
@@ -106,10 +114,12 @@ $$
 
 Update the next guess:
 
+$$
 \begin{align}
   x &= 1 - \frac{D'(1)}{D''(1)} \\
     &= \frac{4}{17}
 \end{align}
+$$
 
 **Second Iteration(Using New Guess from Prev iteration)**
 
@@ -127,10 +137,12 @@ $$
 
 Update the next Guess:
 
+$$
 \begin{align}
   x &= \frac{4}{17} - \frac{D'(\frac{4}{17})}{D''(\frac{4}{17})} \\
     &= 4.598 \times 10^{-3}
 \end{align}
+$$
 
 Using the result from the second iteration, we could compute
 the shortest from the point to the function.
@@ -671,6 +683,7 @@ $$
 
 Solve it parts by parts:
 
+$$
 \begin{align}
 A^T \times A &=
 \begin{bmatrix}
@@ -690,7 +703,9 @@ A^T \times A &=
   6 & 4 
 \end{bmatrix}
 \end{align}
+$$
 
+$$
 \begin{align}
   (A^T \times A)^{-1} &= \frac{1}{det{(A^T \times A)}}
   \begin{bmatrix}
@@ -703,7 +718,9 @@ A^T \times A &=
     -0.3 & 0.7
   \end{bmatrix}
 \end{align}
+$$
 
+$$
 \begin{align}
   (A^T \times A)^{-1} \times A^T \times b &=
   \begin{bmatrix}
@@ -726,6 +743,7 @@ A^T \times A &=
     -0.2
   \end{bmatrix}
 \end{align}
+$$
 
 Therefore the line of best fit is $f(x) = 2.3x - 0.2$ with $MSE=0.575$.
 
@@ -775,6 +793,7 @@ $$
 
 Solve it parts by parts:
 
+$$
 \begin{align}
 A^T \times A &=
 \begin{bmatrix}
@@ -796,7 +815,9 @@ A^T \times A &=
   14 & 6 & 4 
 \end{bmatrix}
 \end{align}
+$$
 
+$$
 \begin{align}
   (A^T \times A)^{-1} = 
   \begin{bmatrix}
@@ -805,7 +826,9 @@ A^T \times A &=
     0.25 & -1.05 & 0.95
   \end{bmatrix}
 \end{align}
+$$
 
+$$
 \begin{align}
   (A^T \times A)^{-1} \times A^T \times b &=
   \begin{bmatrix}
@@ -831,6 +854,7 @@ A^T \times A &=
     0.55
   \end{bmatrix}
 \end{align}
+$$
 
 Therefore the line of best fit is $f(x) = 0.75x^2 +0.05x + 0.55$ with $MSE=0.0125$.
 
@@ -847,25 +871,31 @@ first and second order of partial derivative.
 
 Case 1(fix b):
 
+$$
 \begin{align}
   \frac{\partial E}{\partial m} &= \frac{2}{n} \sum(mx_i+b - y_i)\cdot x_i \\
       &= \frac{1}{2} (14m + 6b -31)
 \end{align}
+$$
 
 Case 2(fix m):
 
+$$
 \begin{align}
   \frac{\partial E}{\partial b} &= \frac{2}{n} \sum(mx_i+b - y_i) \\
       &= \frac{1}{2} (6m + 4b - 13)
 \end{align}
+$$
 
 The second order partial derivatives are constant, since $E$ is
 quadratic in both coefficients:
 
+$$
 \begin{align}
   \frac{\partial^2 E}{\partial m^2} &= \frac{2}{n} \sum x_i^2 = 7 \\
   \frac{\partial^2 E}{\partial b^2} &= \frac{2}{n} \cdot n = 2
 \end{align}
+$$
 
 Each step function are $m_{new}=m-\frac{14m+6b-31}{14}$ and
 $b_{new} = b - \frac{6m+4b-13}{4}$.
@@ -909,41 +939,51 @@ $\sum y_i = 13$, $\sum x_i y_i = 31$ and $\sum x_i^2 y_i = 83$.
 
 Case 1 (fix $b$, $c$):
 
+$$
 \begin{align}
   \frac{\partial E}{\partial a} &= \frac{2}{n} \sum\left(ax_i^2+bx_i+c-y_i\right)x_i^2 \\
       &= \frac{1}{2}\left(98a + 36b + 14c - 83\right) 
 \end{align}
+$$
 
 Case 2 (fix $a$, $c$):
 
+$$
 \begin{align}
   \frac{\partial E}{\partial b} &= \frac{2}{n} \sum\left(ax_i^2+bx_i+c-y_i\right)x_i \\
       &= \frac{1}{2}\left(36a + 14b + 6c - 31\right)
 \end{align}
+$$
 
 Case 3 (fix $a$, $b$):
 
+$$
 \begin{align}
   \frac{\partial E}{\partial c} &= \frac{2}{n} \sum\left(ax_i^2+bx_i+c-y_i\right) \\
       &= \frac{1}{2}\left(14a + 6b + 4c - 13\right)
 \end{align}
+$$
 
 The second order partial derivatives are constant, since $E$ is
 quadratic in every coefficient:
 
+$$
 \begin{align}
   \frac{\partial^2 E}{\partial a^2} &= \frac{2}{n} \sum x_i^4 = 49 \\
   \frac{\partial^2 E}{\partial b^2} &= \frac{2}{n} \sum x_i^2 = 7 \\
   \frac{\partial^2 E}{\partial c^2} &= \frac{2}{n} \cdot n = 2 \tag{12}\label{eq:par_second}
 \end{align}
+$$
 
 Each step function is therefore
 
+$$
 \begin{align}
   a_{new} &= a - \frac{98a + 36b + 14c - 83}{98} \\
   b_{new} &= b - \frac{36a + 14b + 6c - 31}{14} \\
   c_{new} &= c - \frac{14a + 6b + 4c - 13}{4}
 \end{align}
+$$
 
 Starting from $(a, b, c) = (1, 1, 1)$ and substituting each updated
 coefficient into the next step, the first two iterations give:

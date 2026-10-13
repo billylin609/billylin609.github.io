@@ -1,0 +1,27 @@
+---
+import Base from '../layouts/Base.astro';
+import Section from '../components/Section.astro';
+import StatusLog from '../components/StatusLog.astro';
+---
+
+<Base title="Page not found" description="There is nothing at this address.">
+  <Section top={false} inner="px-6 pt-24 pb-[104px] max-md:px-5 max-md:pt-12 max-md:pb-14 overflow-hidden text-center" label="Not found">
+    <div class="grid-bg" style="--gx:50%;--gy:30%" aria-hidden="true"></div>
+    <div class="relative flex flex-col items-center">
+      <p class="label"><b>[404]</b> route not found</p>
+      <h1 class="mt-3 flex items-end gap-2.5 text-[clamp(120px,18vw,220px)] leading-[0.9] font-extrabold tracking-[-0.08em]">404<span class="mb-[0.08em] h-[0.1em] w-[0.44em] bg-cta" aria-hidden="true"></span></h1>
+      <p class="mt-6 text-[18px] max-md:text-[15px] text-steel">There is nothing at this address.</p>
+      <div class="mt-11 w-full flex justify-center">
+        <StatusLog title="billylin609.github.io/404" id="GET 404" status="not found" tone="badge" steps={[
+          { kind: 'route', text: `resolve "${Astro.url.pathname}"`, time: '0.02s', mark: 'x', active: true },
+          { kind: 'hint', text: 'try /resume, /blog, /travel, /coursework or /solutions', time: '-', mark: '?' },
+        ]} />
+      </div>
+      <div class="mt-10 flex gap-4 max-md:flex-col max-md:w-full">
+        <a href="/" class="btn btn-primary">Go home -&gt;</a>
+        <a href="/coursework" class="btn btn-ghost">Browse coursework</a>
+        <a href="/blog" class="btn btn-ghost">Read the blog</a>
+      </div>
+    </div>
+  </Section>
+</Base>

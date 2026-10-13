@@ -1,0 +1,187 @@
+---
+// Travel + Gallery. A photo grid rather than a text list: each trip shows its
+// cover, and clicking the expand control opens it full size in a lightbox.
+// Trips without a cover still get a row underneath so nothing is hidden.
+import { Image, getImage } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import Section from '../../components/Section.astro';
+import EntryList from '../../components/EntryList.astro';
+import { sectionBySlug } from '../../data/sections';
+import { sectionEntries, href, iso, fmtShort } from '../../data/entries';
+
+const section = sectionBySlug('travel')!;
+const items = await sectionEntries('travel');
+
+const withCover = items.filter((e) => e.data.cover);
+const withoutCover = items.filter((e) => !e.data.cover);
+
+// A big version of each cover for the lightbox, built at the same time as the
+// thumbnails so the browser never fetches an unoptimised original.
+const shots = await Promise.all(
+  withCover.map(async (entry) => ({
+    entry,
+    full: (await getImage({ src: entry.data.cover!, width: 1800, format: 'webp' })).src,
+  })),
+);
+---
+
+<Base title={section.label} description={section.lede}>
+  <Section top={false} inner="px-6 pt-20 pb-12 max-md:px-5 max-md:pt-10 max-md:pb-8 overflow-hidden" label={section.label}>
+    <div class="grid-bg" style="--gx:85%;--gy:30%" aria-hidden="true"></div>
+    <div class="relative">
+      <p class="label"><b>[00]</b> travel</p>
+      <h1 class="mt-5 text-[clamp(40px,5.6vw,64px)] leading-[1.02] font-bold tracking-[-0.045em] whitespace-pre-line">{section.title}</h1>
+      <p class="mt-5 max-w-[52ch] text-[16px] leading-[1.6] text-steel max-md:text-[14px]">{section.lede}</p>
+    </div>
+  </Section>
+
+  {items.length === 0 && (
+    <Section inner="px-6 py-14 max-md:px-5 max-md:py-10" label="Empty">
+      <p class="label"><b>[01]</b> nothing here yet</p>
+      <p class="mt-4 max-w-[60ch] text-[15px] leading-[1.6] text-steel">
+        No trips written up yet. Add a folder under
+        <code class="pill">src/content/travel/</code> with an
+        <code class="pill">index.md</code> inside it. Point
+        <code class="pill">cover</code> at a photo in that folder and it shows up
+        in the grid here; add <code class="pill">location</code> and it appears
+        under the title.
+      </p>
+    </Section>
+  )}
+
+  {items.length > 0 && (
+    <Section inner="px-6 py-12 max-md:px-5 max-md:py-9" label="Places">
+      <div class="flex items-end">
+        <p class="label"><b>[01]</b> places been to</p>
+        <span class="ml-auto text-[12px] text-smoke">{items.length} {items.length === 1 ? 'place' : 'places'}</span>
+      </div>
+      <ul class="mt-5 flex flex-wrap gap-x-3 gap-y-2.5">
+        {items.map((e) => (
+          <li>
+            <a href={href(e)} class="group inline-flex items-baseline gap-2.5 px-3 py-1.5 border border-rule hover:border-ink transition-colors">
+              <span class="size-1.5 rounded-full bg-ok translate-y-[-2px]" aria-hidden="true"></span>
+              <span class="text-[14px] font-bold text-ink group-hover:underline underline-offset-4">{e.data.title}</span>
+              <time class="text-[12px] text-smoke tabular-nums" datetime={iso(e.data.date)}>{e.data.date.getUTCFullYear()}</time>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </Section>
+  )}
+
+  {shots.length > 0 && (
+    <Section inner="px-6 py-14 max-md:px-5 max-md:py-10" label="Gallery">
+      <div class="flex items-end">
+        <p class="label"><b>[02]</b> gallery</p>
+        <span class="ml-auto text-[12px] text-smoke">{shots.length} {shots.length === 1 ? 'trip' : 'trips'}</span>
+      </div>
+      <ul class="mt-6 grid grid-cols-3 max-lg:grid-cols-2 max-sm:grid-cols-1 gap-5">
+        {shots.map(({ entry, full }, i) => (
+          <li class="group relative flex flex-col border border-rule hover:border-ink transition-colors">
+            <a href={href(entry)} class="block overflow-hidden bg-tint aspect-[4/3]" tabindex="-1" aria-hidden="true">
+              <Image
+                src={entry.data.cover!}
+                alt=""
+                width={900}
+                densities={[1, 2]}
+                loading={i < 6 ? 'eager' : 'lazy'}
+                class="size-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+              />
+            </a>
+            <div class="flex flex-col flex-1 p-4 border-t border-rule">
+              <p class="flex items-baseline gap-3">
+                <a href={href(entry)} class="text-[16px] font-bold tracking-[-0.02em] text-ink group-hover:underline underline-offset-4">{entry.data.title}</a>
+                <time class="ml-auto shrink-0 text-[12px] text-smoke" datetime={iso(entry.data.date)}>{fmtShort(entry.data.date)}</time>
+              </p>
+              {entry.data.location && <p class="mt-1 text-[13px] text-steel">{entry.data.location}</p>}
+              {entry.data.album && (
+                <p class="mt-auto pt-3">
+                  <a
+                    href={entry.data.album}
+                    target="_blank"
+                    rel="noopener"
+                    class="text-[12px] text-steel hover:text-ink underline underline-offset-4 decoration-rule hover:decoration-ink"
+                  >All photos on Drive -&gt;</a>
+                </p>
+              )}
+            </div>
+            <button
+              type="button"
+              class="absolute top-2 right-2 px-2 py-1 text-[11px] font-bold bg-canvas border border-rule text-steel hover:text-ink hover:border-ink opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity"
+              data-shot={full}
+              data-caption={entry.data.location ? `${entry.data.title} - ${entry.data.location}` : entry.data.title}
+              aria-label={`View ${entry.data.title} full size`}
+            >[expand]</button>
+          </li>
+        ))}
+      </ul>
+    </Section>
+  )}
+
+  {withoutCover.length > 0 && (
+    <Section inner="px-6 py-14 max-md:px-5 max-md:py-10" label="Written up">
+      <div class="flex items-end">
+        <p class="label"><b>{shots.length > 0 ? '[03]' : '[02]'}</b> written up</p>
+        <span class="ml-auto text-[12px] text-smoke">no photographs yet</span>
+      </div>
+      <EntryList items={withoutCover} />
+    </Section>
+  )}
+</Base>
+
+{shots.length > 0 && (
+  <dialog class="lightbox m-auto bg-transparent p-0 max-w-none max-h-none" aria-label="Photograph">
+    <figure class="m-0 flex flex-col items-center gap-3">
+      <img class="max-w-[92vw] max-h-[80vh] object-contain border border-rule bg-canvas" alt="" />
+      <figcaption class="flex items-center gap-5 text-[13px] text-canvas"></figcaption>
+    </figure>
+    <button type="button" class="absolute top-4 right-4 px-2.5 py-1.5 text-[12px] font-bold bg-canvas border border-rule text-ink" data-close>[close]</button>
+    <button type="button" class="absolute left-4 top-1/2 -translate-y-1/2 px-2.5 py-2 text-[14px] font-bold bg-canvas border border-rule text-ink" data-prev aria-label="Previous photograph">&lt;</button>
+    <button type="button" class="absolute right-4 top-1/2 -translate-y-1/2 px-2.5 py-2 text-[14px] font-bold bg-canvas border border-rule text-ink" data-next aria-label="Next photograph">&gt;</button>
+  </dialog>
+)}
+
+<style>
+  .lightbox::backdrop { background: rgb(0 0 0 / 0.82); }
+  .lightbox[open] { display: grid; place-items: center; width: 100vw; height: 100dvh; }
+  :global(html:has(dialog.lightbox[open])) { overflow: hidden; }
+</style>
+
+<script>
+  const box = document.querySelector<HTMLDialogElement>('dialog.lightbox');
+  if (box) {
+    const triggers = [...document.querySelectorAll<HTMLButtonElement>('[data-shot]')];
+    const img = box.querySelector('img')!;
+    const caption = box.querySelector('figcaption')!;
+    let at = 0;
+
+    const show = (i: number) => {
+      at = (i + triggers.length) % triggers.length;
+      const t = triggers[at];
+      img.src = t.dataset.shot!;
+      img.alt = t.dataset.caption!;
+      caption.textContent = `${t.dataset.caption} (${at + 1}/${triggers.length})`;
+    };
+
+    triggers.forEach((t, i) =>
+      t.addEventListener('click', () => {
+        show(i);
+        box.showModal();
+      }),
+    );
+
+    box.querySelector('[data-close]')?.addEventListener('click', () => box.close());
+    box.querySelector('[data-prev]')?.addEventListener('click', () => show(at - 1));
+    box.querySelector('[data-next]')?.addEventListener('click', () => show(at + 1));
+
+    // Click the backdrop - anywhere that is not the figure - to dismiss.
+    box.addEventListener('click', (e) => {
+      if (!(e.target as HTMLElement).closest('figure, button')) box.close();
+    });
+
+    box.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') show(at - 1);
+      if (e.key === 'ArrowRight') show(at + 1);
+    });
+  }
+</script>

@@ -1,0 +1,183 @@
+{
+  "_source": "Generated from the Google Doc by scripts/sync-resume.mjs. Re-run `npm run sync:resume` after editing the doc, or edit this file directly.",
+  "intro": "Systems Design Engineering at the University of Waterloo, working on embedded systems, robotics and computer vision - firmware, drivers and the boards they run on.",
+  "doc": {
+    "view": "https://docs.google.com/document/d/1NlbS4MfB6MhJdZc_8JuYB9X6gKKkf7bl5sWoolPKX9o/view",
+    "pdf": "https://docs.google.com/document/d/1NlbS4MfB6MhJdZc_8JuYB9X6gKKkf7bl5sWoolPKX9o/export?format=pdf"
+  },
+  "contact": [
+    {
+      "label": "Email",
+      "value": "y29lin@uwaterloo.ca",
+      "href": "mailto:y29lin@uwaterloo.ca"
+    },
+    {
+      "label": "GitHub",
+      "value": "billylin609",
+      "href": "https://github.com/billylin609"
+    },
+    {
+      "label": "LinkedIn",
+      "value": "yu-chen-uow",
+      "href": "https://www.linkedin.com/in/yu-chen-uow/"
+    }
+  ],
+  "experience": [
+    {
+      "role": "Embedded Security Engineer",
+      "org": "ETAS",
+      "orgHref": "https://www.etas.com/ww/en/",
+      "location": "Waterloo, ON",
+      "period": "May 2026 - Sep 2026",
+      "notes": [
+        "Refactored two blocking functions into a producer-consumer model, offloading batched messaging to a worker thread.",
+        "Prototyped an encrypted image packaging pipeline, using tiarmhex to split ELFs into memory sections and TI's MetaImage Creator to merge them into an encrypted tri-core appimage.",
+        "Validated prefetch abort handler (asm), MPU memory zone protection, and OTP key loading on a TI mmWave target.",
+        "Extended the Python firewall config tool to a new chip, encoding user-defined permission regions into bytecode."
+      ]
+    },
+    {
+      "role": "Computer Vision Research Assistant",
+      "org": "National Research Center",
+      "orgHref": "https://vip.uwaterloo.ca/",
+      "location": "Waterloo, ON",
+      "period": "Sep 2024 - Apr 2026",
+      "notes": [
+        "Optimized path planning algorithm, reducing imagery overlapping by 8% while maintaining > 95% aerial coverage.",
+        "Implemented Merkle Tree data structure to validate folders across servers to improve corruption checking efficiency.",
+        "Implemented CNN models with Dice Loss metric to benchmark multi-temporal RGB image change detection datasets."
+      ]
+    },
+    {
+      "role": "Firmware Engineering Intern",
+      "org": "Motorola Solutions",
+      "orgHref": "https://www.motorolasolutions.com/en_us.html",
+      "location": "Vaughan, ON",
+      "period": "Sep 2023 - Aug 2024",
+      "notes": [
+        "Migrated 67 ATE tests to Linux and developed firmware regression tests like EEPROM error injection, validating AES encryption features and improving device driver reliability.",
+        "Designed a USB Linux driver to enable synchronized variable attenuator control for hardware-in-the-loop simulator."
+      ]
+    },
+    {
+      "role": "Firmware Engineering Intern (Media Systems)",
+      "org": "Ford Motor Company",
+      "orgHref": "https://www.ford.com/",
+      "location": "Ottawa, ON",
+      "period": "Jan 2023 - Apr 2023",
+      "notes": [
+        "Developed 17 C unit tests, achieved 100% CAN message module coverage, fixing defects and MISRA C violations.",
+        "Implemented an Arduino remote firmware flashing and debugging kits, enabling real-time trace logging over Wi-Fi.",
+        "Characterized loss rates and latency of CAN, LIN, and Ethernet communications utilizing Vector CANoe."
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "role": "Technical Director",
+      "org": "UWaterloo Robotics Team",
+      "orgHref": "https://uwroboticsmarketing.github.io/",
+      "location": "Waterloo",
+      "period": "Jun 2022 - Present",
+      "notes": [
+        "Led 50+ students to design, build, and test autonomous rover for annual competition; ranked 41 out of 108 teams.",
+        "Developed power distribution board firmware with CAN telemetry, featuring SoC Estimation, OVP, and OCP.",
+        "Developed an I2C resource manager on QNX RTOS featuring blocking and interrupt-driven (GPIO based) R/W.",
+        "Implemented Rocker-Bogie drivetrain kinematics with ROS joint trajectory controller with vel and pos commands."
+      ]
+    },
+    {
+      "role": "Flight Test Coordinator",
+      "org": "Waterloo Aerial Robotics Team",
+      "orgHref": "https://www.uwarg.com/",
+      "location": "Waterloo",
+      "period": "Sep 2022 - Present",
+      "notes": [
+        "Brought up multiple drone systems from scratch, configuring and integrating sensors (IMU, GPS, compass, optical flow), motor controller and flight controllers for testing and performance validation.",
+        "Designed a telemetry manager to handle MAVLink messaging protocol and decodes SBUS controller messages.",
+        "Designed a breakout PCB to convert GPIO headers to 6-pin JST-GH connector with Tx/Rx UART indicators.",
+        "Implemented I2C GPS NMEA protocol parsing driver on STM32, utilizing RTOS to achieve 1 Hz GPS data acquisition."
+      ]
+    },
+    {
+      "role": "QNX Mobility",
+      "org": "Hack the North",
+      "orgHref": "https://devpost.com/software/canqnx",
+      "location": "Waterloo, ON",
+      "period": "Sep 2025",
+      "notes": [
+        "Won the BlackBerry Hardware Prize among 80+ competing teams and developed an IMU-based navigation node featuring extended Kalman filter and MQTT telemetry."
+      ]
+    }
+  ],
+  "education": [
+    {
+      "role": "BASc, System Design Engineering",
+      "org": "University of Waterloo",
+      "orgHref": "",
+      "location": "Waterloo, ON",
+      "period": "Sep 2022 - Apr 2027",
+      "notes": []
+    }
+  ],
+  "skills": [
+    {
+      "group": "Software",
+      "items": [
+        "C/C++",
+        "Python",
+        "Simulink/MATLAB",
+        "Rust",
+        "Cuda",
+        "PyTorch",
+        "Linux",
+        "ROS Humble",
+        "CMake",
+        "Git",
+        "Bash"
+      ]
+    },
+    {
+      "group": "Tools",
+      "items": [
+        "Arm (STM32, nRF, Ti)",
+        "ESP",
+        "Altium",
+        "KiCad",
+        "LTspice",
+        "FreeRTOS",
+        "Simulation X",
+        "Jenkins",
+        "Docker",
+        "QNX"
+      ]
+    },
+    {
+      "group": "Protocol",
+      "items": [
+        "UART",
+        "I2C",
+        "SPI",
+        "CAN-FD/2.0",
+        "TCP/IP",
+        "UDP",
+        "PWM",
+        "USB (2.0)",
+        "LIN",
+        "Mavlink"
+      ]
+    },
+    {
+      "group": "Hardware",
+      "items": [
+        "Oscilloscope",
+        "Function Generator",
+        "Power Supply",
+        "DMM",
+        "Eload",
+        "Solder/Hot Air Rework",
+        "Logic Analyzer"
+      ]
+    }
+  ]
+}

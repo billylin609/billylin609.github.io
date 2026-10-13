@@ -1,0 +1,133 @@
+---
+// Resume & Portfolio. The resume itself is a single standalone page rather
+// than a listing - it reads top to bottom. The portfolio grid underneath is
+// driven by whatever sits in src/content/resume/.
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import Section from '../../components/Section.astro';
+import SectionHead from '../../components/SectionHead.astro';
+import { sectionBySlug } from '../../data/sections';
+import { sectionEntries, href, iso, fmtShort } from '../../data/entries';
+import resume from '../../data/resume.json';
+
+const section = sectionBySlug('resume')!;
+const projects = await sectionEntries('resume');
+
+// The three timeline blocks, in the order the resume reads.
+const blocks = [
+  { title: 'Work Experience', slug: 'experience', idx: '01', rows: resume.experience },
+  { title: 'Personal Projects', slug: 'projects', idx: '02', rows: resume.projects },
+  { title: 'Education', slug: 'education', idx: '03', rows: resume.education },
+];
+---
+
+<Base title={section.label} description={resume.intro}>
+  <Section top={false} inner="px-6 pt-20 pb-12 max-md:px-5 max-md:pt-10 max-md:pb-8 overflow-hidden" label={section.label}>
+    <div class="grid-bg" style="--gx:85%;--gy:30%" aria-hidden="true"></div>
+    <div class="relative">
+      <p class="label"><b>[00]</b> resume</p>
+      <h1 class="mt-5 text-[clamp(40px,5.6vw,64px)] leading-[1.02] font-bold tracking-[-0.045em] whitespace-pre-line">{section.title}</h1>
+      <p class="mt-5 max-w-[60ch] text-[16px] leading-[1.6] text-steel max-md:text-[14px]">{resume.intro}</p>
+      <ul class="mt-7 flex flex-wrap gap-x-8 gap-y-2 text-[13px]">
+        {resume.contact.map((c) => (
+          <li class="flex gap-2">
+            <span class="text-smoke">{c.label}</span>
+            {c.href
+              ? <a href={c.href} target={c.href.startsWith('http') ? '_blank' : undefined} rel="noopener" class="text-ink underline underline-offset-4 hover:text-steel">{c.value}</a>
+              : <span class="text-stone">{c.value}</span>}
+          </li>
+        ))}
+      </ul>
+      {(resume.doc?.view || resume.doc?.pdf) && (
+        <div class="mt-8 flex flex-wrap items-center gap-4 max-md:flex-col max-md:items-stretch">
+          {resume.doc.pdf && (
+            <a href={resume.doc.pdf} target="_blank" rel="noopener" class="btn btn-primary btn-s max-md:w-full">Download as PDF -&gt;</a>
+          )}
+          {resume.doc.view && (
+            <a href={resume.doc.view} target="_blank" rel="noopener" class="btn btn-ghost btn-s max-md:w-full">Open in Google Docs -&gt;</a>
+          )}
+        </div>
+      )}
+    </div>
+  </Section>
+
+  {blocks.map(({ title, slug, idx, rows }) => (
+    <Section id={slug} inner="px-6 py-14 max-md:px-5 max-md:py-10" label={title}>
+      <p class="label"><b>[{idx}]</b> {title.toLowerCase()}</p>
+      <ul class="mt-6 border-t border-rule">
+        {rows.map((r) => (
+          <li class="grid grid-cols-[180px_1fr] max-md:grid-cols-1 gap-x-8 gap-y-2 py-6 border-b border-rule">
+            <p class="text-[13px] text-smoke pt-1 tabular-nums">{r.period}</p>
+            <div>
+              <p class="text-[17px] max-md:text-[15px] font-bold tracking-[-0.02em] text-ink">{r.role}</p>
+              <p class="mt-1 text-[14px] text-steel">
+                {r.orgHref
+                  ? <a href={r.orgHref} target="_blank" rel="noopener" class="underline underline-offset-4 decoration-rule hover:text-ink hover:decoration-ink">{r.org}</a>
+                  : <span>{r.org}</span>}
+                {r.location && <span> &middot; {r.location}</span>}
+              </p>
+              {r.notes.length > 0 && (
+                <ul class="mt-3 space-y-1.5 text-[13px] leading-[1.6] text-steel max-w-[76ch]">
+                  {r.notes.map((n) => (
+                    <li class="flex gap-2.5"><span class="text-stone shrink-0" aria-hidden="true">-</span><span>{n}</span></li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </li>
+        ))}
+      </ul>
+    </Section>
+  ))}
+
+  <Section id="skills" inner="px-6 py-14 max-md:px-5 max-md:py-10" label="Skills">
+    <p class="label"><b>[04]</b> skills</p>
+    <dl class="mt-6 border-t border-rule">
+      {resume.skills.map((s) => (
+        <div class="grid grid-cols-[180px_1fr] max-md:grid-cols-1 gap-x-8 gap-y-2 py-5 border-b border-rule">
+          <dt class="text-[13px] text-smoke pt-0.5">{s.group}</dt>
+          <dd class="flex flex-wrap gap-2">
+            {s.items.map((i) => <span class="pill">{i}</span>)}
+          </dd>
+        </div>
+      ))}
+    </dl>
+  </Section>
+
+  <Section id="portfolio" inner="px-6 py-14 max-md:px-5 max-md:py-10" label="Portfolio">
+    <SectionHead idx="05" label="portfolio" title="Selected work." lede="Projects written up in full. Each one links through to the whole thing." />
+    {projects.length === 0 ? (
+      <p class="mt-8 max-w-[56ch] text-[15px] leading-[1.6] text-steel">
+        No portfolio pieces yet. Add a folder under
+        <code class="pill">src/content/resume/</code> with an
+        <code class="pill">index.md</code> inside it and it will appear here.
+      </p>
+    ) : (
+      <ul class="mt-8 grid grid-cols-3 max-lg:grid-cols-2 max-sm:grid-cols-1 gap-5">
+        {projects.map((p) => (
+          <li>
+            <a href={href(p)} class="group flex flex-col h-full border border-rule hover:border-ink transition-colors">
+              {p.data.cover && (
+                <span class="block overflow-hidden bg-tint aspect-[4/3] border-b border-rule">
+                  <Image
+                    src={p.data.cover}
+                    alt={p.data.title}
+                    width={760}
+                    densities={[1, 2]}
+                    class="size-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                  />
+                </span>
+              )}
+              <span class="flex flex-col flex-1 p-5">
+                <time class="text-[12px] text-smoke" datetime={iso(p.data.date)}>{fmtShort(p.data.date)}</time>
+                <span class="mt-3 text-[17px] font-bold tracking-[-0.02em] text-ink group-hover:underline underline-offset-4">{p.data.title}</span>
+                <span class="mt-2 text-[13px] leading-[1.5] text-steel">{p.data.summary}</span>
+                <span class="mt-auto pt-4 text-stone font-bold group-hover:text-ink" aria-hidden="true">-&gt;</span>
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    )}
+  </Section>
+</Base>

@@ -1,0 +1,51 @@
+---
+// A whole section listing page: hero, then the entries grouped by sub-folder.
+// Used by /coursework, /blog and /solutions, which differ only in their data.
+import Base from '../layouts/Base.astro';
+import Section from './Section.astro';
+import EntryList from './EntryList.astro';
+import { sectionBySlug } from '../data/sections';
+import { sectionEntries, groupEntries } from '../data/entries';
+
+interface Props { slug: string }
+const { slug } = Astro.props;
+
+const section = sectionBySlug(slug);
+if (!section) throw new Error(`No section named "${slug}" in src/data/sections.ts`);
+
+const items = await sectionEntries(slug);
+const groups = groupEntries(items);
+const count = (n: number) => `${n} ${n === 1 ? 'entry' : 'entries'}`;
+---
+
+<Base title={section.label} description={section.lede}>
+  <Section top={false} inner="px-6 pt-20 pb-12 max-md:px-5 max-md:pt-10 max-md:pb-8 overflow-hidden" label={section.label}>
+    <div class="grid-bg" style="--gx:85%;--gy:30%" aria-hidden="true"></div>
+    <div class="relative">
+      <p class="label"><b>[00]</b> {section.slug}</p>
+      <h1 class="mt-5 text-[clamp(40px,5.6vw,64px)] leading-[1.02] font-bold tracking-[-0.045em] whitespace-pre-line">{section.title}</h1>
+      <p class="mt-5 max-w-[52ch] text-[16px] leading-[1.6] text-steel max-md:text-[14px]">{section.lede}</p>
+    </div>
+  </Section>
+
+  {items.length === 0 ? (
+    <Section inner="px-6 py-14 max-md:px-5 max-md:py-10" label="Empty">
+      <p class="label"><b>[01]</b> nothing here yet</p>
+      <p class="mt-4 max-w-[56ch] text-[15px] leading-[1.6] text-steel">
+        This section is still being written. Add a folder under
+        <code class="pill">src/content/{section.slug}/</code> with an
+        <code class="pill">index.md</code> inside it and it will appear here.
+      </p>
+    </Section>
+  ) : (
+    groups.map(({ group, items: rows }, i) => (
+      <Section inner="px-6 py-14 max-md:px-5 max-md:py-10" label={group || section.label}>
+        <div class="flex items-end">
+          <p class="label"><b>[{String(i + 1).padStart(2, '0')}]</b> {group || section.short}</p>
+          <span class="ml-auto text-[12px] text-smoke">{count(rows.length)}</span>
+        </div>
+        <EntryList items={rows} />
+      </Section>
+    ))
+  )}
+</Base>

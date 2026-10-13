@@ -1,0 +1,123 @@
+---
+import Base from '../layouts/Base.astro';
+import Section from '../components/Section.astro';
+import SectionHead from '../components/SectionHead.astro';
+import MediaWindow from '../components/MediaWindow.astro';
+import { site } from '../data/site';
+import { sections } from '../data/sections';
+import { allEntries, href, iso, fmtShort } from '../data/entries';
+
+const work = await allEntries();
+const recent = work.slice(0, 8);
+
+// Entry counts per section, so the homepage says what is actually there.
+const index = sections.map((s) => ({
+  ...s,
+  count: work.filter((w) => w.id.split('/')[0] === s.slug).length,
+}));
+
+const elsewhere = [
+  ['GH', 'GitHub', 'billylin609', site.github],
+  ['</>', 'Source', 'this site, start to finish', site.repo],
+];
+---
+
+<Base>
+  <!-- [00] Hero -->
+  <Section top={false} inner="px-6 pt-16 pb-20 lg:pt-24 lg:pb-28 max-md:px-5 overflow-hidden" label="Intro">
+    <div class="grid-bg" style="--gx:76%;--gy:45%" aria-hidden="true"></div>
+    <div class="relative grid grid-cols-1 lg:grid-cols-[1fr_560px] gap-14 lg:gap-12 items-center">
+      <div>
+        <p class="label"><b>[00]</b> uwaterloo · systems design engineering</p>
+        <h1 class="mt-5 text-[clamp(42px,5.6vw,68px)] leading-[1.02] font-bold tracking-[-0.045em]">
+          Hi, I'm Yuchen.
+        </h1>
+        <p class="mt-6 max-w-[48ch] text-[16px] leading-[1.6] text-steel max-md:text-[15px]">
+          Systems Design Engineering student at the University of Waterloo. This is where I
+          keep my work: coursework written out in full, things I have built, problems I have
+          solved, and the places I have been.
+        </p>
+        <div class="mt-9 flex flex-wrap items-center gap-x-7 gap-y-4">
+          <a href="/resume" class="btn btn-primary max-md:w-full">Resume &amp; portfolio -&gt;</a>
+          <a href={site.github} target="_blank" rel="noopener" class="link text-[15px]">GitHub -&gt;</a>
+        </div>
+      </div>
+      <MediaWindow title="~/yuchen" tag="index" shadow>
+        <ol class="py-1.5 text-[13px]">
+          {index.map((s, i) => (
+            <li>
+              <a href={`/${s.slug}`} class="grid grid-cols-[2.5ch_1fr_auto] items-center gap-3 px-4 h-10 hover:bg-tint">
+                <span class="text-smoke">{String(i + 1).padStart(2, '0')}</span>
+                <span class="text-ink truncate">{s.label}</span>
+                <span class="text-smoke tabular-nums">{s.count}</span>
+              </a>
+            </li>
+          ))}
+        </ol>
+        <p class="flex items-center gap-2.5 h-10 px-4 border-t border-ink bg-tint text-[12px] text-ink">
+          <span class="text-smoke">$</span> {work.length} {work.length === 1 ? 'entry' : 'entries'}
+          <span class="size-1.5 rounded-full bg-ok" aria-hidden="true"></span>
+          <span class="text-steel">rendered as HTML, math and all</span>
+        </p>
+      </MediaWindow>
+    </div>
+  </Section>
+
+  <!-- [01] Sections -->
+  <Section id="sections" label="Sections">
+    <SectionHead idx="01" label="sections" title={'Five places\nto look.'} lede="The site is split five ways. Each one keeps its own pages, listed newest first." />
+    <ul class="mt-10 grid grid-cols-3 max-lg:grid-cols-2 max-sm:grid-cols-1 gap-5">
+      {index.map((s, i) => (
+        <li>
+          <a href={`/${s.slug}`} class="group flex flex-col h-full p-5 border border-rule hover:border-ink transition-colors">
+            <span class="flex items-baseline gap-3">
+              <span class="label"><b>[{String(i + 1).padStart(2, '0')}]</b></span>
+              <span class="ml-auto text-[12px] text-smoke tabular-nums">{s.count} {s.count === 1 ? 'entry' : 'entries'}</span>
+            </span>
+            <span class="mt-3 text-[18px] font-bold tracking-[-0.02em] text-ink group-hover:underline underline-offset-4">{s.label}</span>
+            <span class="mt-2 text-[13px] leading-[1.5] text-steel">{s.lede}</span>
+            <span class="mt-auto pt-4 text-stone font-bold group-hover:text-ink" aria-hidden="true">-&gt;</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </Section>
+
+  <!-- [02] Recent -->
+  {recent.length > 0 && (
+    <Section id="recent" label="Recent">
+      <SectionHead idx="02" label="recent" title={'Latest, across\neverything.'} lede="The most recent pages from every section." />
+      <ul class="mt-10 border-t border-rule">
+        {recent.map((w) => (
+          <li>
+            <a href={href(w)} class="group grid grid-cols-[140px_130px_1fr_auto] max-md:grid-cols-[1fr_auto] gap-x-6 gap-y-1 items-center py-[18px] border-b border-rule">
+              <time class="text-[13px] text-smoke max-md:order-2 max-md:col-span-2" datetime={iso(w.data.date)}>{fmtShort(w.data.date)}</time>
+              <span class="text-[11px] uppercase tracking-[0.06em] text-steel max-md:hidden">{w.data.group ?? w.data.category}</span>
+              <span class="text-[16px] max-md:text-[15px] text-ink group-hover:underline underline-offset-4">{w.data.title}</span>
+              <span class="text-stone font-bold group-hover:text-ink" aria-hidden="true">-&gt;</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </Section>
+  )}
+
+  <!-- [03] Elsewhere -->
+  <Section mode="invert" label="Elsewhere">
+    <SectionHead idx="03" label="elsewhere" title="Elsewhere." />
+    <ul class="mt-9 border-t border-rule max-w-[760px]">
+      {elsewhere.map(([glyph, title, note, link]) => (
+        <li class="border-b border-rule">
+          <a href={link} target="_blank" rel="noopener" class="group flex items-center gap-3.5 py-4">
+            <span class="key">{glyph}</span>
+            <span>
+              <span class="block text-[15px] font-bold text-ink group-hover:underline underline-offset-4">{title}</span>
+              <span class="block mt-1 text-[13px] text-steel">{note}</span>
+            </span>
+            <span class="ml-auto text-stone font-bold group-hover:text-ink" aria-hidden="true">-&gt;</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </Section>
+</Base>
