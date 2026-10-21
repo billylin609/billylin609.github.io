@@ -189,3 +189,104 @@ those 100 samples: degree 6 drives the training RMS down to 4.21 while
 diverging outside the range the training data covers, pushing the test RMS to
 1,009.13.
 
+### d) L2-regularization  degree 8 regression
+
+Ridge regression is least squares with an L2 penalty $\lambda\|w\|^2$ on the
+weights, which gives
+
+$$
+w^{*} = \left(\Phi\Phi^T + \lambda I\right)^{-1}\Phi y
+\tag{4}\label{eq:ridge}
+$$
+
+The penalty shrinks the weights toward zero, so $\lambda$ transform overfitting
+into underfitting. A large $\lambda$ usually flattens the fit.
+The implementation for ridge regression are
+
+```python
+Phi = self.design_matrix(X)
+A = Phi.T @ Phi + np.diag(lam)
+self.w = np.linalg.pinv(A) @ (Phi.T @ y)
+```
+
+Training RMS cannot be used to choose $\lambda$, since it always favours the
+smallest penalty, and the test set must stay untouched for the final
+evaluation. Instead, $\lambda$ is chosen by 10-fold cross-validation on the 100
+training samples.
+
+The samples are shuffled once and split into 10 folds of 10. For each
+$\lambda$, the model is fitted on 9 folds (90 samples) and its RMS is measured
+on the held-out fold. This repeats until every fold has been held out once, and
+the 10 validation RMS values are averaged. The same folds are used for every
+$\lambda$, and the one with the lowest mean validation RMS is selected. The
+final weights are then fitted with that $\lambda$ on all 100 training samples.
+
+
+```python
+def regularized_fit(self, X: np.ndarray, y: np.ndarray, lam: np.ndarray,
+                cross_validation: bool = False, folds=None):
+if cross_validation:
+    if folds is None:
+        folds = KFold(n_splits=10, shuffle=True, random_state=0)
+    self.cv_train_rms, self.cv_val_rms = self.cross_validate(X, y, lam, folds)
+
+self._ridge_solve(X, y, lam)
+return self
+
+def cross_validate(self, X: np.ndarray, y: np.ndarray, lam: np.ndarray, folds):
+    train_rms, val_rms = [], []
+    for train_idx, val_idx in folds.split(X):
+        self._ridge_solve(X[train_idx], y[train_idx], lam)
+        train_rms.append(self.evaluate(X[train_idx], y[train_idx]))
+        val_rms.append(self.evaluate(X[val_idx], y[val_idx]))
+    return float(np.mean(train_rms)), float(np.mean(val_rms))
+```
+
+![Mean 10-fold validation RMS against λ, linear scale](figs/ridge_cv_lambda_linear.png)
+
+![Mean 10-fold validation RMS against λ, log scale](figs/ridge_cv_lambda.png)
+
+Mean RMS over the 10 folds for each $\lambda$, including the unregularized
+baseline $\lambda = 0$:
+
+| $\lambda$ | Mean train RMS ($1000s) | Mean validation RMS ($1000s) |
+|:---:|---:|---:|
+| 0 | 3.892 | 4.497 |
+| **0.01** | **4.278** | **4.332** |
+| 0.1 | 4.373 | 4.373 |
+| 1 | 4.911 | 4.833 |
+| 10 | 6.452 | 6.229 |
+| 100 | 12.559 | 12.329 |
+| 1000 | 20.947 | 20.830 |
+
+From the cross-validation, I would choose $\lambda = 0.01$ as the regularizing
+constant, since it gives the smallest mean validation RMS (4.332) for the
+degree 8 polynomial basis.
+
+However, the test set tells a different story. Even at $\lambda = 0.01$ the
+fit still overfits: almost half of the test samples have INDUS values beyond
+the training range, where the degree 8 curve dives. A larger
+$\lambda$ keeps the curve flatter there, so the test RMS is lowest at
+$\lambda = 10$.
+
+![Test RMS against λ](figs/ridge_test_rms.png)
+
+| $\lambda$ | Train RMS ($1000s) | Test RMS ($1000s) |
+|:---:|---:|---:|
+| 0.01 | 4.292 | 342.682 |
+| 0.1 | 4.373 | 152.907 |
+| 1 | 4.882 | 86.858 |
+| **10** | **6.351** | **17.962** |
+| 100 | 12.094 | 22.269 |
+| 1000 | 20.741 | 21.464 |
+
+![Degree 8 ridge fit on the training set for each λ](figs/ridge_fit_train.png)
+
+![Degree 8 ridge fit on the test set for each λ](figs/ridge_fit_test.png)
+
+Cross-validation can only judge the model where the training data lies, so it
+cannot see the extrapolation error that dominates the test RMS.
+
+
+
+
