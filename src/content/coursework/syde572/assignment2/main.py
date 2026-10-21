@@ -93,23 +93,143 @@ def plot_poly1d(x_train, y_train, x_test, y_test, grid, curve, degree, name,
     plt.close(fig)
 
 
-def plot_gaussian_rms(n_basis, train_rms, test_rms, out_path: Path):
+def plot_gaussian_overlap(centers, a_values, out_path: Path, ncols=2):
     '''
-    Part 2e: training and test RMS against the number of Gaussian basis functions.
+    The same basis drawn at each width a: one panel per value, wide bumps that
+    overlap and cover the axis through to narrow bumps that leave gaps between
+    the centres. The dashed line is the sum of the bumps, i.e. how much basis
+    there is to fit with at each x. Panels share a y axis so the sums compare.
     '''
-    fig, ax = plt.subplots(figsize=(7, 4.6))
-    ax.plot(n_basis, train_rms, marker="o", linewidth=2, color="#2a78d6", label="Training")
-    ax.plot(n_basis, test_rms, marker="s", linewidth=2, color="#eb6834", label="Test")
+    x = np.linspace(centers.min() - 0.7, centers.max() + 0.7, 600)
+    spacing = float(np.mean(np.diff(centers)))
+    shades = ["#9ec5e8", "#6ba4d9", "#2a78d6", "#1b4f8c", "#0d2a4d"]
 
-    ax.set_yscale("log")
-    ax.set_xticks(n_basis)
-    ax.set_xlabel("Number of basis functions $K$")
-    ax.set_ylabel("RMS error ($1000s, log scale)")
-    ax.set_title("Gaussian basis regression: RMS error vs. $K$")
-    ax.grid(True, which="major", color="#e4e3df", linewidth=0.8)
+    nrows = int(np.ceil(len(a_values) / ncols))
+    fig, axes = plt.subplots(nrows, ncols, figsize=(5.6 * ncols, 3.9 * nrows),
+                             sharex=True, sharey=True, squeeze=False)
+    flat = axes.ravel()
+    for ax, a in zip(flat, a_values):
+        bumps = np.exp(a * (x[:, None] - centers[None, :]) ** 2)
+        for k in range(len(centers)):
+            ax.plot(x, bumps[:, k], linewidth=1.8, color=shades[k % len(shades)])
+        ax.plot(x, bumps.sum(axis=1), linewidth=2, linestyle="--", color="#eb6834",
+                label="sum of all bumps")
+        ax.scatter(centers, np.zeros(len(centers)), s=45, color="#3d3d3a",
+                   zorder=5, label="centres $c_k$")
+
+        # value a neighbouring bump still has at the midpoint between centres
+        midpoint = np.exp(a * (spacing / 2) ** 2)
+        ax.set_title(f"$a$ = {a:g}:  $\\phi$ = {midpoint:.3f} midway between centres")
+        ax.grid(True, color="#e4e3df", linewidth=0.8)
+        for side in ("top", "right"):
+            ax.spines[side].set_visible(False)
+        ax.legend(frameon=False, fontsize=9, loc="upper right")
+
+    for ax in flat[len(a_values):]:
+        ax.set_visible(False)
+    for ax in axes[-1]:
+        ax.set_xlabel("$x$")
+    for ax in axes[:, 0]:
+        ax.set_ylabel(r"$\phi_k(x)$")
+
+    flat[0].set_ylim(-0.1, None)
+    fig.suptitle("Gaussian basis coverage at each width")
+    fig.tight_layout()
+    fig.savefig(out_path, dpi=150)
+    plt.close(fig)
+
+
+def plot_gaussian_shape(a_values, median_distance, out_path: Path):
+    '''
+    The basis function phi(r) = exp(a * r^2) against the distance r from its
+    centre, for a range of a. The dashed line marks the median distance between
+    the normalized training points, which is the spacing the bumps have to span.
+    '''
+    r = np.linspace(0, 1.6, 400)
+    # light to dark as the bumps get narrower
+    shades = ["#c6dbf0", "#9ec5e8", "#6ba4d9", "#2a78d6", "#1b4f8c", "#0d2a4d"]
+
+    fig, ax = plt.subplots(figsize=(7, 4.6))
+    for a, color in zip(a_values, shades):
+        ax.plot(r, np.exp(a * r ** 2), linewidth=2, color=color, label=f"$a$ = {a:g}")
+    ax.axvline(median_distance, color="#eb6834", linestyle="--", linewidth=1.6,
+               label=f"median centre spacing ({median_distance:.2f})")
+
+    ax.set_xlim(0, 1.6)
+    ax.set_ylim(0, 1.05)
+    ax.set_xlabel(r"Distance from centre $\|x - c_k\|$")
+    ax.set_ylabel(r"$\phi_k(x)$")
+    ax.set_title(r"Gaussian basis function shape for a range of $a$")
+    ax.grid(True, color="#e4e3df", linewidth=0.8)
     for side in ("top", "right"):
         ax.spines[side].set_visible(False)
-    ax.legend(frameon=False)
+    ax.legend(frameon=False, fontsize=9)
+    fig.tight_layout()
+    fig.savefig(out_path, dpi=150)
+    plt.close(fig)
+
+
+def plot_gaussian_rms(n_basis, series, split, out_path: Path):
+    '''
+    Part 2e: RMS against the number of Gaussian basis functions as grouped bars,
+    one bar per width a within each K. series maps a -> the RMS values lined up
+    with n_basis.
+    '''
+    # light to dark as the bumps get narrower
+    shades = ["#9ec5e8", "#4a90d9", "#1b4f8c", "#0d2a4d"]
+    x = np.arange(len(n_basis))
+    width = 0.8 / len(series)
+
+    fig, ax = plt.subplots(figsize=(10, 4.8))
+    for i, ((a, values), color) in enumerate(zip(series.items(), shades)):
+        offset = (i - (len(series) - 1) / 2) * width
+        ax.bar(x + offset, values, width * 0.9, color=color,
+               label=f"$a$ = {a:g}", zorder=2)
+
+    # log scale: the test bars span one value to several hundred
+    flat = [v for values in series.values() for v in values]
+    ax.set_yscale("log")
+    ax.set_ylim(min(flat) / 2, max(flat) * 4)
+    ax.set_xticks(x, [str(k) for k in n_basis])
+    ax.set_xlabel("Number of basis functions $K$")
+    ax.set_ylabel(f"{split} RMS error ($1000s, log scale)")
+    ax.set_title(f"Gaussian basis regression: {split.lower()} error vs. $K$")
+    ax.grid(True, axis="y", which="major", color="#e4e3df", linewidth=0.8, zorder=0)
+    for side in ("top", "right"):
+        ax.spines[side].set_visible(False)
+    ax.legend(frameon=False, fontsize=9, ncol=4, loc="upper left")
+    fig.tight_layout()
+    fig.savefig(out_path, dpi=150)
+    plt.close(fig)
+
+
+def plot_lambda_series(lams, series, out_path: Path, ylabel, title,
+                       marks, mark_label):
+    '''
+    Part 2f: RMS against the regularizing constant on a log axis, one line per
+    width a. lambda = 0 has no position on a log axis and is left out of lams.
+    marks maps a -> the index to ring on that line.
+    '''
+    # light to dark as the bumps get narrower
+    shades = ["#9ec5e8", "#4a90d9", "#1b4f8c", "#0d2a4d"]
+    markers = ["o", "s", "^", "D"]
+
+    fig, ax = plt.subplots(figsize=(7.5, 4.8))
+    for (a, values), color, marker in zip(series.items(), shades, markers):
+        ax.semilogx(lams, values, marker=marker, linewidth=2, color=color,
+                    label=f"$a$ = {a:g}", zorder=3)
+        i = marks[a]
+        ax.scatter([lams[i]], [values[i]], s=110, facecolors="none",
+                   edgecolors="#eb6834", linewidths=1.8, zorder=4)
+
+    ax.set_yscale("log")
+    ax.set_xlabel(r"Regularizing constant $\lambda$ (log scale)")
+    ax.set_ylabel(ylabel)
+    ax.set_title(title)
+    ax.grid(True, which="both", color="#e4e3df", linewidth=0.8, zorder=0)
+    for side in ("top", "right"):
+        ax.spines[side].set_visible(False)
+    ax.legend(frameon=False, fontsize=9, title=mark_label, title_fontsize=8)
     fig.tight_layout()
     fig.savefig(out_path, dpi=150)
     plt.close(fig)
@@ -259,28 +379,38 @@ if __name__ == "__main__":
 
     print()
 
-    # L2-regularized degree 8 fit on the first 100 points, second feature only.
-    # lambda = 0 is kept in the sweep as the unregularized baseline.
     reg_degree = 8
     lambdas = [0.0, 0.01, 0.1, 1.0, 10.0, 100.0, 1000.0]
     n_weights = 1 + reg_degree  # single feature, so 1 + 1 * degree
     folds = KFold(n_splits=10, shuffle=True, random_state=0)
 
-    # This part uses the first 100 points as its whole dataset, so the scaler is
-    # fitted on them rather than on all 506. Scaling them to [0, 1] instead of
-    # [0, 0.53] keeps the basis columns O(1), which is the scale the lambda grid
-    # above assumes.
-    x_reg = MinMaxScaler().fit_transform(x_train)
+    reg_scaler = MinMaxScaler().fit(x_train)
+    x_reg, x_reg_test = reg_scaler.transform(x_train), reg_scaler.transform(x_test)
+    reg_grid = np.linspace(min(x_reg.min(), x_reg_test.min()),
+                           max(x_reg.max(), x_reg_test.max()), 400).reshape(-1, 1)
 
     print(f"10-fold CV for a degree {reg_degree} fit on {name}")
-    print(f"{'lambda':>10}{'mean val RMS':>16}{'mean train RMS':>18}")
-    mean_val, mean_train = [], []
+    print(f"{'lambda':>10}{'mean val RMS':>16}{'mean train RMS':>18}"
+          f"{'train RMS':>12}{'test RMS':>12}")
+    mean_val, mean_train, reg_test_rms = [], [], []
+    train_fits, test_fits = {}, {}
     for lam in lambdas:
         model = PolynomialBasis(reg_degree).regularized_fit(
             x_reg, y_train, np.full(n_weights, lam), cross_validation=True, folds=folds)
         mean_train.append(model.cv_train_rms)
         mean_val.append(model.cv_val_rms)
-        print(f"{lam:>10g}{mean_val[-1]:>16.4f}{mean_train[-1]:>18.4f}")
+
+        fit_train = model.evaluate(x_reg, y_train)
+        fit_test = model.evaluate(x_reg_test, y_test)
+        print(f"{lam:>10g}{mean_val[-1]:>16.4f}{mean_train[-1]:>18.4f}"
+              f"{fit_train:>12.4f}{fit_test:>12.4f}")
+
+        if lam == 0.0:
+            continue
+        curve = model.predict(reg_grid)
+        train_fits[lam] = (curve, fit_train)
+        test_fits[lam] = (curve, fit_test)
+        reg_test_rms.append(fit_test)
 
     best = int(np.argmin(mean_val))
     print(f"\nbest lambda = {lambdas[best]:g} (mean validation RMS {mean_val[best]:.4f})")
@@ -292,22 +422,6 @@ if __name__ == "__main__":
                        f"Degree {reg_degree} polynomial: 10-fold CV error vs. $\\lambda$",
                        log_scale=log_scale)
         print(f"plot saved to {out_path}")
-
-    # refit each lambda on all 100 points (lambda = 0 left out); the test split
-    # goes through the same scaler, so it can land outside [0, 1]
-    x_reg_test = MinMaxScaler().fit(x_train).transform(x_test)
-    reg_grid = np.linspace(min(x_reg.min(), x_reg_test.min()),
-                           max(x_reg.max(), x_reg_test.max()), 400).reshape(-1, 1)
-
-    print(f"\n{'lambda':>10}{'train RMS':>12}{'test RMS':>12}")
-    train_fits, test_fits, reg_test_rms = {}, {}, []
-    for lam in lambdas[1:]:
-        m = PolynomialBasis(reg_degree).regularized_fit(x_reg, y_train, np.full(n_weights, lam))
-        curve = m.predict(reg_grid)
-        train_fits[lam] = (curve, m.evaluate(x_reg, y_train))
-        test_fits[lam] = (curve, m.evaluate(x_reg_test, y_test))
-        reg_test_rms.append(test_fits[lam][1])
-        print(f"{lam:>10g}{train_fits[lam][1]:>12.4f}{test_fits[lam][1]:>12.4f}")
 
     out_path = FIG_DIR / "ridge_test_rms.png"
     plot_cv_lambda(lambdas[1:], reg_test_rms, out_path,
@@ -325,48 +439,82 @@ if __name__ == "__main__":
 
     print()
 
-    # Part 2e: Gaussian basis regression, centres taken from a random permutation
-    # of the 100 training points (done inside GaussianBasis). No regularization.
     n_basis = list(range(5, 96, 10))
+    a_values = [-0.1, -1.0, -5.0, -20.0]
 
-    print(f"{'basis K':<10}{'train RMS':>12}{'test RMS':>14}")
-    gauss_train, gauss_test = [], []
-    for k in n_basis:
-        model = GaussianBasis(X_train_norm, n_centers=k).fit(X_train_norm, y_train)
-        gauss_train.append(model.evaluate(X_train_norm, y_train))
-        gauss_test.append(model.evaluate(X_test_norm, y_test))
-        print(f"{k:<10}{gauss_train[-1]:>12.4f}{gauss_test[-1]:>14.4e}")
-
-    out_path = FIG_DIR / "gaussian_rms.png"
-    plot_gaussian_rms(n_basis, gauss_train, gauss_test, out_path)
+    pair_dist = np.linalg.norm(X_train_norm[:, None, :] - X_train_norm[None, :, :], axis=-1)
+    median_spacing = np.median(pair_dist[~np.eye(N_TRAIN, dtype=bool)])
+    out_path = FIG_DIR / "gaussian_shape.png"
+    plot_gaussian_shape([-0.1, -0.5, -1, -2, -5, -20], median_spacing, out_path)
     print(f"plot saved to {out_path}")
+
+    out_path = FIG_DIR / "gaussian_overlap.png"
+    plot_gaussian_overlap(np.arange(5) * median_spacing, a_values, out_path)
+    print(f"plot saved to {out_path}")
+    print()
+
+    gauss_train = {a: [] for a in a_values}
+    gauss_test = {a: [] for a in a_values}
+    for k in n_basis:
+        for a in a_values:
+            model = GaussianBasis(X_train_norm, n_centers=k, a=a).fit(X_train_norm, y_train)
+            gauss_train[a].append(model.evaluate(X_train_norm, y_train))
+            gauss_test[a].append(model.evaluate(X_test_norm, y_test))
+
+    header = "".join(f"{f'a={a:g}':>14}" for a in a_values)
+    for split, series in (("train", gauss_train), ("test", gauss_test)):
+        print(f"{split} RMS")
+        print(f"{'K':<6}{header}")
+        for i, k in enumerate(n_basis):
+            print(f"{k:<6}" + "".join(f"{series[a][i]:>14.4f}" for a in a_values))
+        print()
+
+    for split, series in (("Training", gauss_train), ("Test", gauss_test)):
+        out_path = FIG_DIR / f"gaussian_rms_{split.lower()}.png"
+        plot_gaussian_rms(n_basis, series, split, out_path)
+        print(f"plot saved to {out_path}")
 
     print()
 
-    # Part 2f: the same basis with 90 centres and an L2 penalty, all 13 features,
-    # lambda again chosen by 10-fold cross-validation over the 100 training points
     n_centers_g = 90
     n_weights_g = 1 + n_centers_g
 
-    print(f"10-fold CV for a {n_centers_g} centre Gaussian basis")
-    print(f"{'lambda':>10}{'mean val RMS':>16}{'mean train RMS':>18}")
-    mean_val_g, mean_train_g = [], []
-    for lam in lambdas:
-        model = GaussianBasis(X_train_norm, n_centers=n_centers_g).regularized_fit(
-            X_train_norm, y_train, np.full(n_weights_g, lam), cross_validation=True, folds=folds)
-        mean_train_g.append(model.cv_train_rms)
-        mean_val_g.append(model.cv_val_rms)
-        print(f"{lam:>10g}{mean_val_g[-1]:>16.4f}{mean_train_g[-1]:>18.4f}")
+    cv_val_g = {a: [] for a in a_values}
+    test_g = {a: [] for a in a_values}
+    for a in a_values:
+        for lam in lambdas:
+            model = GaussianBasis(X_train_norm, n_centers=n_centers_g, a=a).regularized_fit(
+                X_train_norm, y_train, np.full(n_weights_g, lam),
+                cross_validation=True, folds=folds)
+            cv_val_g[a].append(model.cv_val_rms)
+            test_g[a].append(model.evaluate(X_test_norm, y_test))
 
-    best_g = int(np.argmin(mean_val_g))
-    print(f"\nbest lambda = {lambdas[best_g]:g} "
-          f"(mean validation RMS {mean_val_g[best_g]:.4f})")
-    print(f"unregularized baseline (lambda = 0): {mean_val_g[0]:.4f}")
+    header = "".join(f"{f'a={a:g}':>14}" for a in a_values)
+    print(f"{n_centers_g} centre Gaussian basis, all {X_train_norm.shape[1]} features")
+    for split, series in (("mean 10-fold validation RMS", cv_val_g),
+                          ("test RMS", test_g)):
+        print(f"{split}")
+        print(f"{'lambda':<8}{header}")
+        for i, lam in enumerate(lambdas):
+            print(f"{lam:<8g}" + "".join(f"{series[a][i]:>14.4f}" for a in a_values))
+        print()
 
-    out_path = FIG_DIR / "gaussian_cv_lambda.png"
-    plot_cv_lambda(lambdas[1:], mean_val_g[1:], out_path,
-                   f"{n_centers_g} Gaussian basis functions: "
-                   f"10-fold CV error vs. $\\lambda$")
-    print(f"plot saved to {out_path}")
+    for a in a_values:
+        best_g = int(np.argmin(cv_val_g[a]))
+        print(f"a={a:>6g}: best lambda = {lambdas[best_g]:<7g} "
+              f"(validation RMS {cv_val_g[a][best_g]:8.4f}, "
+              f"test RMS {test_g[a][best_g]:8.4f})")
+
+    cv_choice = {a: int(np.argmin(cv_val_g[a][1:])) for a in a_values}
+    plots = ((cv_val_g, "gaussian_cv_lambda.png", "Mean validation RMS ($1000s)",
+              f"{n_centers_g} Gaussian basis functions: 10-fold CV error"),
+             (test_g, "gaussian_test_lambda.png", "Test RMS ($1000s)",
+              f"{n_centers_g} Gaussian basis functions: test error"))
+    for series, filename, ylabel, title in plots:
+        out_path = FIG_DIR / filename
+        plot_lambda_series(lambdas[1:], {a: v[1:] for a, v in series.items()},
+                           out_path, ylabel, title + r" vs. $\lambda$",
+                           cv_choice, r"orange ring = $\lambda$ chosen by CV")
+        print(f"plot saved to {out_path}")
 
     plt.show()

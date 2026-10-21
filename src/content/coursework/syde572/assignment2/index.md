@@ -287,6 +287,147 @@ $\lambda = 10$.
 Cross-validation can only judge the model where the training data lies, so it
 cannot see the extrapolation error that dominates the test RMS.
 
+## Part 2: Gaussian Basis Function
+
+### e) Fitting through gaussian regression
+
+According to textbook the function used for guassian basis function is:
+
+$$
+\varphi_k(\mathbf{x}, \mathbf{c}_k, a) = \exp\left(a\|\mathbf{x} - \mathbf{c}_k\|^2\right)
+$$
+
+$a$ sets the width and must be negative. A more negative $a$ gives a narrower
+bump and less overlap between neighbouring basis functions. $K$ is the number
+of basis functions, selected by taking a random permutation of the 100 training
+points and using the first $K$ of them as the centres $\mathbf{c}_k$, which
+gives $1 + K$ weights once the bias is included.
+
+The figure below shows the four widths used in the experiment. When $|a|$ is
+small the bumps are wide and almost identical, so the coverage is a single
+broad hump centred in the middle of the data; when $|a|$ is large each bump is
+narrow and the coverage breaks into separate spikes with gaps between them.
+
+![Gaussian basis coverage at each width](figs/gaussian_overlap.png)
+
+```python
+def design_matrix(self, X: np.ndarray) -> np.ndarray:
+  '''
+  X: (N, d) -> Phi: (N, 1 + K), columns [1, phi_1(x), ..., phi_K(x)]
+  >>> model = GaussianBasis(np.array([[0., 0.], [1., 1.]]), n_centers=2)
+  >>> model.centers
+  array([[0., 0.],
+          [1., 1.]])
+  >>> Phi = model.design_matrix(np.array([[0., 0.]]))
+  >>> Phi.shape
+  (1, 3)
+  >>> Phi.round(4)
+  array([[1.    , 1.    , 0.1353]])
+  '''
+  # Prepare Data
+  X = np.atleast_2d(np.asarray(X))[:, None, :]
+  centers = self.centers[None, :, :]
+  # Compute the basis function
+  sq_distances = ((X - centers) ** 2).sum(axis=-1)
+  Phi_basis = np.exp(self.a * sq_distances)
+  # Append the bias term
+  bias_column = np.ones((X.shape[0], 1))
+  Phi = np.hstack([bias_column, Phi_basis])
+  return Phi
+```
+
+Each $K$ in $\{5, 15, 25, \dots, 95\}$ is fitted at each of the four widths,
+with no regularization. The best width for each $K$ is shown in bold.
+
+**Training RMS ($1000s)**
+
+| $K$ | $a=-0.1$ | $a=-1$ | $a=-5$ | $a=-20$ |
+|:---:|---:|---:|---:|---:|
+| 5 | **3.4171** | 3.5334 | 4.1490 | 4.8687 |
+| 15 | **2.0234** | 2.1641 | 3.1895 | 4.7499 |
+| 25 | **1.4434** | 1.6132 | 2.6441 | 4.0264 |
+| 35 | **1.3793** | 1.4559 | 1.9860 | 2.6588 |
+| 45 | **1.2103** | 1.2479 | 1.3506 | 2.2670 |
+| 55 | 1.0930 | **1.0810** | 1.1639 | 1.6937 |
+| 65 | **0.8861** | 0.9457 | 1.1135 | 1.5512 |
+| 75 | **0.7749** | 0.8654 | 1.0016 | 1.3664 |
+| 85 | **0.4924** | 0.6928 | 0.9439 | 1.1462 |
+| 95 | 0.2066 | **0.2005** | 0.2897 | 0.2946 |
+
+![Gaussian basis training error vs. K](figs/gaussian_rms_training.png)
+
+**Test RMS ($1000s)**
+
+| $K$ | $a=-0.1$ | $a=-1$ | $a=-5$ | $a=-20$ |
+|:---:|---:|---:|---:|---:|
+| 5 | **7.14** | 10.26 | 9.90 | 9.81 |
+| 15 | **6.68** | 11.90 | 10.04 | 9.80 |
+| 25 | 14.98 | 11.42 | 10.30 | **9.78** |
+| 35 | 13.57 | 9.55 | **8.82** | 9.62 |
+| 45 | 20.59 | 12.87 | **8.66** | 9.68 |
+| 55 | 29.20 | 16.29 | **8.80** | 9.83 |
+| 65 | 102.04 | 19.14 | **8.76** | 9.85 |
+| 75 | 97.86 | 15.26 | **8.70** | 9.86 |
+| 85 | 349.86 | 10.33 | **8.61** | 9.93 |
+| 95 | 631.97 | 59.37 | 10.15 | **9.68** |
+
+![Gaussian basis test error vs. K](figs/gaussian_rms_test.png)
+
+The more data points used as the centres of the basis, the more the model
+overfits the training data, and the closer $a$ is to zero the better it fits
+the training set.
+
+The test data frame tell a different result. $a = -0.1$ has the
+lowest training error at almost every $K$ but the highest test error beyond
+$K = 25$, and at $K = 95$ all four widths reach a training RMS of about 0.2
+while their test errors differ by a factor of 65.
 
 
+### f) L2-regularized gaussian regression
 
+The same basis is now fitted with $K = 90$ centres on all 13 features of the
+first 100 points, using each $\lambda$ in $\{0, 0.01, 0.1, 1, 10, 100, 1000\}$
+and the same four widths. $\lambda$ is chosen by 10-fold cross-validation over
+the 100 training points. The best $\lambda$ for each width is shown in bold.
+
+**Mean 10-fold validation RMS ($1000s)**
+
+| $\lambda$ | $a=-0.1$ | $a=-1$ | $a=-5$ | $a=-20$ |
+|:---:|---:|---:|---:|---:|
+| 0 | 7.64 | 46.91 | 456.41 | 22,658.67 |
+| 0.01 | **2.83** | **1.99** | 2.53 | 3.99 |
+| 0.1 | 3.30 | 2.33 | **2.31** | **3.34** |
+| 1 | 4.14 | 3.22 | 2.71 | 3.51 |
+| 10 | 5.17 | 4.49 | 4.69 | 5.06 |
+| 100 | 5.72 | 5.65 | 8.68 | 12.22 |
+| 1000 | 6.23 | 7.91 | 16.16 | 20.87 |
+
+![Validation error vs. lambda for each width](figs/gaussian_cv_lambda.png)
+
+**Test RMS ($1000s)**
+
+| $\lambda$ | $a=-0.1$ | $a=-1$ | $a=-5$ | $a=-20$ |
+|:---:|---:|---:|---:|---:|
+| 0 | 36.12 | 45.90 | **8.75** | 9.65 |
+| 0.01 | **6.48** | 9.02 | 8.77 | 9.62 |
+| 0.1 | 8.96 | **7.72** | 8.86 | **9.59** |
+| 1 | 8.90 | 8.82 | 9.14 | 9.65 |
+| 10 | 9.09 | 12.75 | 11.65 | 10.34 |
+| 100 | 9.50 | 14.36 | 16.85 | 15.56 |
+| 1000 | 10.26 | 15.94 | 21.31 | 22.76 |
+
+![Test error vs. lambda for each width](figs/gaussian_test_lambda.png)
+
+$\lambda = 0$ is left out of both plots because it has no position on a log
+axis. It is by far the worst setting: with 91 weights fitted to 90 points in
+each fold the unregularized system is underdetermined, and the validation error
+grows from 7.64 at $a = -0.1$ to 22,658.67 at $a = -20$ as the bumps narrow and
+the design matrix approaches the identity. Any $\lambda \geq 0.01$ removes this
+entirely.
+
+From the cross-validation results I would use $\lambda = 0.1$ as my
+regularizing constant for the narrower bases ($a = -5$ and $a = -20$), and
+$\lambda = 0.01$ for the wider ones ($a = -0.1$ and $a = -1$). The orange ring
+on both plots marks that choice, so the second plot shows whether it was a good
+one: it is close to the test optimum in every case except $a = -1$, where
+cross-validation picks 0.01 but 0.1 would have given a lower test error.
