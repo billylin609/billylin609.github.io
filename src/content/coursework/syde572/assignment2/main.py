@@ -2,7 +2,8 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
-from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import KFold
+from sklearn.preprocessing import MinMaxScaler
 
 from dataLoader import DataLoader
 from models.polynomial_basis import PolynomialBasis
@@ -13,19 +14,6 @@ COLUMNS = ["CRIM", "ZN", "INDUS", "CHAS", "NOX", "RM", "AGE", "DIS",
            "RAD", "TAX", "PTRATIO", "B", "LSTAT", "MEDV"]
 N_TRAIN = 100
 FIG_DIR = Path(__file__).resolve().parent / "figs"
-
-
-def polynomial_regression(X_train, y_train, X_test, y_test, degrees):
-    '''
-    Part 1a: fit an unregularized polynomial basis regression for each degree.
-    Returns the training and test RMS error per degree.
-    '''
-    train_rms, test_rms = [], []
-    for degree in degrees:
-        model = PolynomialBasis(degree).fit(X_train, y_train)
-        train_rms.append(model.evaluate(X_train, y_train))
-        test_rms.append(model.evaluate(X_test, y_test))
-    return train_rms, test_rms
 
 
 def plot_rms(degrees, train_rms, test_rms, out_path: Path):
@@ -58,98 +46,186 @@ def plot_rms(degrees, train_rms, test_rms, out_path: Path):
     return fig
 
 
-def part1a(X_train, y_train, X_test, y_test):
+def plot_poly1d(x_train, y_train, x_test, y_test, grid, curve, degree, name,
+                train_rms, test_rms, out_path: Path):
+    '''
+    One figure per degree for Part 1c: the learned polynomial against the
+    training split on the left and the same curve against the test split on the
+    right. Both panels share axes so the two can be compared directly.
+    '''
+    fig, axes = plt.subplots(1, 2, figsize=(11, 4.6), sharex=True, sharey=True)
+
+    panels = [(axes[0], x_train, y_train, "Training", "#2a78d6", True, train_rms),
+              (axes[1], x_test, y_test, "Test", "#eb6834", False, test_rms)]
+    for ax, x, y, label, color, filled, rms in panels:
+        ax.plot(grid, curve, color="#3d3d3a", linewidth=2,
+                label=f"Degree {degree} fit", zorder=4)
+        if filled:
+            ax.scatter(x, y, s=30, color=color, label=f"{label} data", zorder=3)
+        else:
+            ax.scatter(x, y, s=30, marker="^", linewidths=1.2, facecolors="none",
+                       edgecolors=color, label=f"{label} data", zorder=3)
+
+        # RMS blows up past a few thousand at high degree; switch to scientific there
+        rms_label = f"{rms:,.3f}" if rms < 1e4 else f"{rms:.3e}"
+        ax.set_title(f"{label} set — RMS = {rms_label}", fontsize=11)
+        ax.set_xlabel(f"{name} (normalized)")
+        ax.grid(True, color="#e4e3df", linewidth=0.8, zorder=0)
+        for side in ("top", "right"):
+            ax.spines[side].set_visible(False)
+        ax.legend(frameon=False, loc="upper left", fontsize=9)
+
+    # open the view far enough to show where the high-order curves start to
+    # diverge, but cap it at 1.5x the data span so the points stay readable.
+    # Prices are positive, so the view starts at 0 however far a curve dives,
+    # and 25% of headroom is left at the top as a clear band for the legend.
+    y_all = np.concatenate([y_train, y_test])
+    lo, hi = y_all.min(), y_all.max()
+    pad, cap = 0.1 * (hi - lo), 1.5 * (hi - lo)
+    top = max(hi + pad, min(curve.max(), hi + cap))
+    axes[0].set_ylim(0, top * 1.25)
+    axes[0].set_ylabel("MEDV ($1000s)")
+
+    fig.suptitle(f"{name}: degree {degree} polynomial fit")
+    fig.tight_layout()
+    fig.savefig(out_path, dpi=150)
+    plt.close(fig)
+
+
+def plot_cv_lambda(lams, val_rms, baseline, out_path: Path):
+    '''
+    Part 1d: average 10-fold validation RMS against the regularizing constant.
+    lams and val_rms exclude lambda = 0, which has no position on a log axis;
+    it is drawn as a horizontal baseline instead.
+    '''
+    best = int(np.argmin(val_rms))
+
+    fig, ax = plt.subplots(figsize=(7, 4.6))
+    ax.semilogx(lams, val_rms, marker="o", linewidth=2, color="#2a78d6",
+                label="Mean validation RMS", zorder=3)
+    ax.axhline(baseline, color="#eb6834", linestyle="--", linewidth=1.8,
+               label=f"Unregularized ($\\lambda = 0$): {baseline:,.3f}", zorder=2)
+    ax.scatter([lams[best]], [val_rms[best]], s=110, facecolors="none",
+               edgecolors="#3d3d3a", linewidths=1.8, zorder=4,
+               label=f"Best $\\lambda$ = {lams[best]:g} ({val_rms[best]:.3f})")
+
+    ax.set_xlabel("Regularizing constant $\\lambda$ (log scale)")
+    ax.set_ylabel("RMS error ($1000s)")
+    ax.set_title("10-fold cross-validation error vs. $\\lambda$")
+    ax.grid(True, which="both", color="#e4e3df", linewidth=0.8, zorder=0)
+    for side in ("top", "right"):
+        ax.spines[side].set_visible(False)
+    ax.legend(frameon=False, fontsize=9)
+    fig.tight_layout()
+    fig.savefig(out_path, dpi=150)
+    plt.close(fig)
+
+
+if __name__ == "__main__":
+    loader = DataLoader(DATA_URL, COLUMNS)
+    X_all = loader.drop("MEDV")
+    loader.train_test_split(X_all, loader["MEDV"], N_TRAIN, False)
+    X_train, y_train = loader.get_train()
+    X_test, y_test = loader.get_test()
+
     degrees = list(range(1, 8))
-    train_rms, test_rms = polynomial_regression(X_train, y_train, X_test, y_test, degrees)
-    for d, tr, te in zip(degrees, train_rms, test_rms):
-        print(f"degree {d}: train RMS = {tr:.4f}, test RMS = {te:.4e}")
+    train_rms, test_rms = [], []
+    for degree in degrees:
+        model = PolynomialBasis(degree).fit(X_train, y_train)
+        train_rms.append(model.evaluate(X_train, y_train))
+        test_rms.append(model.evaluate(X_test, y_test))
+        print(f"degree {degree}: train RMS = {train_rms[-1]:.4f}, "
+              f"test RMS = {test_rms[-1]:.4e}")
 
     FIG_DIR.mkdir(exist_ok=True)
     out_path = FIG_DIR / "polynomial_rms.png"
     plot_rms(degrees, train_rms, test_rms, out_path)
     print(f"plot saved to {out_path}")
 
+    print()
 
-def part1b(X_train, y_train, scaler: StandardScaler):
-    '''
-    Part 1b: degree 1 fit, report the learned weights.
-    The model is trained on standardized features z = (x - mu) / sigma, so each weight is
-    "$1000s per training standard deviation". Undo the normalization to get per-unit weights:
-        y = b + sum_j w_j z_j  =>  w_j' = w_j / sigma_j,  b' = b - sum_j w_j * mu_j / sigma_j
-    '''
-    model = PolynomialBasis(degree=1).fit(X_train, y_train)
+    scaler = MinMaxScaler().fit(X_all)
+    X_train_norm, X_test_norm = scaler.transform(X_train), scaler.transform(X_test)
+
+    raw_model = PolynomialBasis(degree=1).fit(X_train, y_train)
+    model = PolynomialBasis(degree=1).fit(X_train_norm, y_train)
+    raw_bias, raw_w = raw_model.w[0], raw_model.w[1:]
     bias, w = model.w[0], model.w[1:]
-    mu, sigma = scaler.mean_, scaler.scale_
-    w_orig = w / sigma
-    bias_orig = bias - np.sum(w * mu / sigma)
 
-    features = COLUMNS[:-1]
-    print(f"{'weight':<8}{'feature':<10}{'standardized':>14}{'original units':>16}")
-    print(f"{'bias':<8}{'':<10}{bias:>14.4f}{bias_orig:>16.4f}")
-    for j, name in enumerate(features):
-        print(f"{'w' + str(j):<8}{name:<10}{w[j]:>14.4f}{w_orig[j]:>16.4f}")
+    print(f"{'':<10}{'raw':>12}{'normalized':>12}")
+    print(f"{'bias':<10}{raw_bias:>12.4f}{bias:>12.4f}")
+    for name, rw, nw in zip(COLUMNS[:-1], raw_w, w):
+        print(f"{name:<10}{rw:>12.4f}{nw:>12.4f}")
 
-    rm, dis = features.index("RM"), features.index("DIS")
-    print(f"\nRM  (6th feature, w{rm}): {w[rm]:.4f} per std ({sigma[rm]:.3f} rooms) "
-          f"= {w_orig[rm]:.4f} ($1000s per room)")
-    print(f"DIS (8th feature, w{dis}): {w[dis]:.4f} per std ({sigma[dis]:.3f}) "
-          f"= {w_orig[dis]:.4f} ($1000s per unit of weighted distance)")
+    print()
 
+    print(f"{'':<12}{'train RMS':>12}{'test RMS':>12}")
+    for label, m, A, B in (("raw", raw_model, X_train, X_test),
+                           ("normalized", model, X_train_norm, X_test_norm)):
+        print(f"{label:<12}{m.evaluate(A, y_train):>12.4f}{m.evaluate(B, y_test):>12.4f}")
 
-def compare_standardization(X_train, y_train, X_test, y_test, scaler: StandardScaler):
-    '''
-    Run the Part 1a sweep on raw and on standardized features and compare the RMS errors.
-    X_train / X_test are the raw (unscaled) features.
-    '''
-    degrees = list(range(1, 8))
-    raw_train, raw_test = polynomial_regression(X_train, y_train, X_test, y_test, degrees)
-    std_train, std_test = polynomial_regression(
-        scaler.transform(X_train), y_train, scaler.transform(X_test), y_test, degrees)
+    print()
 
-    print(f"{'degree':<8}{'train raw':>12}{'train std':>12}{'test raw':>14}{'test std':>14}")
-    for d, rtr, str_, rte, ste in zip(degrees, raw_train, std_train, raw_test, std_test):
-        print(f"{d:<8}{rtr:>12.4f}{str_:>12.4f}{rte:>14.4e}{ste:>14.4e}")
+    feature = 2
+    name = COLUMNS[feature]
+    x_train, x_test = X_train[:, [feature]], X_test[:, [feature]]
 
-    fig, axes = plt.subplots(1, 2, figsize=(11, 4.5))
-    # training error spans ~0.9-3.8 (linear); test error spans ~1e1-1e16 (log)
-    panels = [(axes[0], raw_train, std_train, "Training RMS error", "linear"),
-              (axes[1], raw_test, std_test, "Test RMS error (log scale)", "log")]
-    for ax, raw, std, title, scale in panels:
-        ax.plot(degrees, raw, marker="o", linewidth=2, color="#2a78d6", label="Raw features")
-        ax.plot(degrees, std, marker="s", linewidth=2, color="#eb6834", label="Standardized")
-        ax.set_yscale(scale)
-        ax.set_title(title)
-        ax.set_xlabel("Polynomial degree")
-        ax.set_xticks(degrees)
-        ax.grid(True, axis="y", which="major", color="#e4e3df", linewidth=0.8)
-        for side in ("top", "right"):
-            ax.spines[side].set_visible(False)
-    axes[0].set_ylabel("RMS error ($1000s)")
-    axes[0].legend(frameon=False)
-    fig.tight_layout()
+    scaler_1d = MinMaxScaler().fit(X_all[:, [feature]])
+    x_train_norm = scaler_1d.transform(x_train)
+    x_test_norm = scaler_1d.transform(x_test)
 
-    FIG_DIR.mkdir(exist_ok=True)
-    out_path = FIG_DIR / "standardization_rms.png"
-    fig.savefig(out_path, dpi=150)
+    grid = np.linspace(min(x_train_norm.min(), x_test_norm.min()),
+                       max(x_train_norm.max(), x_test_norm.max()), 400).reshape(-1, 1)
+
+    print(f"single-feature fits on {name} (column {feature}, 0-based)")
+    print(f"{'degree':<8}{'train RMS':>12}{'test RMS':>14}")
+    for degree in degrees:
+        model = PolynomialBasis(degree).fit(x_train_norm, y_train)
+        train_rms_1d = model.evaluate(x_train_norm, y_train)
+        test_rms_1d = model.evaluate(x_test_norm, y_test)
+        print(f"{degree:<8}{train_rms_1d:>12.4f}{test_rms_1d:>14.4e}")
+
+        out_path = FIG_DIR / f"poly1d_{name.lower()}_degree{degree}.png"
+        plot_poly1d(x_train_norm, y_train, x_test_norm, y_test, grid,
+                    model.predict(grid), degree, name,
+                    train_rms_1d, test_rms_1d, out_path)
+    print(f"figures saved to {FIG_DIR}/poly1d_{name.lower()}_degree*.png")
+
+    print()
+
+    # L2-regularized degree 8 fit on the first 100 points, second feature only.
+    # lambda = 0 is kept in the sweep as the unregularized baseline.
+    reg_degree = 8
+    lambdas = [0.0, 0.01, 0.1, 1.0, 10.0, 100.0, 1000.0]
+    n_weights = 1 + reg_degree  # single feature, so 1 + 1 * degree
+    folds = KFold(n_splits=10, shuffle=True, random_state=0)
+
+    # This part uses the first 100 points as its whole dataset, so the scaler is
+    # fitted on them rather than on all 506. Scaling them to [0, 1] instead of
+    # [0, 0.53] keeps the basis columns O(1), which is the scale the lambda grid
+    # above assumes.
+    x_reg = MinMaxScaler().fit_transform(x_train)
+
+    print(f"10-fold CV for a degree {reg_degree} fit on {name}")
+    print(f"{'lambda':>10}{'mean val RMS':>16}{'mean train RMS':>18}")
+    mean_val, mean_train = [], []
+    for lam in lambdas:
+        val_rms, train_rms_cv = [], []
+        for train_idx, val_idx in folds.split(x_reg):
+            model = PolynomialBasis(reg_degree).regularized_fit(
+                x_reg[train_idx], y_train[train_idx], np.full(n_weights, lam))
+            train_rms_cv.append(model.evaluate(x_reg[train_idx], y_train[train_idx]))
+            val_rms.append(model.evaluate(x_reg[val_idx], y_train[val_idx]))
+        mean_val.append(np.mean(val_rms))
+        mean_train.append(np.mean(train_rms_cv))
+        print(f"{lam:>10g}{mean_val[-1]:>16.4f}{mean_train[-1]:>18.4f}")
+
+    best = int(np.argmin(mean_val))
+    print(f"\nbest lambda = {lambdas[best]:g} (mean validation RMS {mean_val[best]:.4f})")
+    print(f"unregularized baseline (lambda = 0): {mean_val[0]:.4f}")
+
+    out_path = FIG_DIR / "ridge_cv_lambda.png"
+    plot_cv_lambda(lambdas[1:], mean_val[1:], mean_val[0], out_path)
     print(f"plot saved to {out_path}")
 
-
-if __name__ == "__main__":
-    loader = DataLoader(DATA_URL, COLUMNS)
-    # first 100 points for training, the remainder for testing
-    loader.train_test_split(loader.drop("MEDV"), loader["MEDV"], N_TRAIN, False)
-    X_train, y_train = loader.get_train()
-    X_test, y_test = loader.get_test()
-
-    # standardize with training statistics so high powers (e.g. TAX^7 ~ 1e19)
-    # don't make the design matrix ill-conditioned; StandardScaler leaves
-    # zero-variance columns (CHAS is all 0 in the first 100 rows) unscaled
-    scaler = StandardScaler().fit(X_train)
-    X_train_std, X_test_std = scaler.transform(X_train), scaler.transform(X_test)
-
-    part1a(X_train_std, y_train, X_test_std, y_test)
-    print()
-    part1b(X_train_std, y_train, scaler)
-    print()
-    compare_standardization(X_train, y_train, X_test, y_test, scaler)
     plt.show()
