@@ -116,7 +116,7 @@ The model fits the training data well but the test RMS is orders
 of magnitude larger, growing with degree up to degree 5.
 
 The input data is not normalized, so the high powers explode. The fitting using
-higher order polynomials does not provide meaning prediction on the test dataset.
+higher order polynomials does not provide meaningful prediction on the test dataset.
 
 ### b) Normalized degree 1 polynomial basis fitting
 
@@ -419,15 +419,17 @@ the 100 training points. The best $\lambda$ for each width is shown in bold.
 ![Test error vs. lambda for each width](figs/gaussian_test_lambda.png)
 
 $\lambda = 0$ is left out of both plots because it has no position on a log
-axis. It is by far the worst setting: with 91 weights fitted to 90 points in
-each fold the unregularized system is underdetermined, and the validation error
-grows from 7.64 at $a = -0.1$ to 22,658.67 at $a = -20$ as the bumps narrow and
-the design matrix approaches the identity. Any $\lambda \geq 0.01$ removes this
-entirely.
-
-From the cross-validation results I would use $\lambda = 0.1$ as my
+axis. From the cross-validation results I would use $\lambda = 0.1$ as my
 regularizing constant for the narrower bases ($a = -5$ and $a = -20$), and
 $\lambda = 0.01$ for the wider ones ($a = -0.1$ and $a = -1$). The orange ring
-on both plots marks that choice, so the second plot shows whether it was a good
-one: it is close to the test optimum in every case except $a = -1$, where
-cross-validation picks 0.01 but 0.1 would have given a lower test error.
+on both plots marks that choice.
+
+## Source Code
+
+The complete implementation is available on GitHub:
+[`main.py`](https://github.com/billylin609/billylin609.github.io/blob/main/src/content/coursework/syde572/assignment2/main.py) drives every part and produces the figures,
+[`dataLoader.py`](https://github.com/billylin609/billylin609.github.io/blob/main/src/content/coursework/syde572/assignment2/dataLoader.py) loads and splits the dataset, and the
+models live in
+[`linear_regression.py`](https://github.com/billylin609/billylin609.github.io/blob/main/src/content/coursework/syde572/assignment2/models/linear_regression.py),
+[`polynomial_basis.py`](https://github.com/billylin609/billylin609.github.io/blob/main/src/content/coursework/syde572/assignment2/models/polynomial_basis.py) and
+[`gaussian_basis.py`](https://github.com/billylin609/billylin609.github.io/blob/main/src/content/coursework/syde572/assignment2/models/gaussian_basis.py).
