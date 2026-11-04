@@ -16,11 +16,11 @@ summary: "Assignment 3 homework submission page"
 
 | Sample | $x_1$ | $x_2$ |
 |:---:|:---:|:---:|
-| ① | $-2$ | $-1$ |
-| ② | $-1$ | $0$ |
-| ③ | $0$ | $1$ |
-| ④ | $1$ | $2$ |
-| ⑤ | $2$ | $3$ |
+| 1 | $-2$ | $-1$ |
+| 2 | $-1$ | $0$ |
+| 3 | $0$ | $1$ |
+| 4 | $1$ | $2$ |
+| 5 | $2$ | $3$ |
 
 ---
 
@@ -162,7 +162,7 @@ C_y = A\,C_x\,A^T =
 = \begin{bmatrix} 4 & 0 \\ 0 & 0 \end{bmatrix}
 $$
 
-$C_y$ is diagonal, so the transformed components are **uncorrelated**.
+$C_y$ is diagonal, so the transformed components are uncorrelated.
 
 ---
 
@@ -249,3 +249,115 @@ $$
 $$
 
 The point $(3, 4)$ lies exactly on the line $x_2 = x_1 + 1$ spanned by $PC_1$ through the mean, so it is reconstructed perfectly.
+
+The full handwritten solutions are in the [appendix](#appendix-handwritten-solutions).
+
+## Part II: Data Visualization
+
+We plot every combination of one, two and three features.
+
+![Iris marginalized onto one feature](figs/iris_one_feature.png)
+
+![Iris marginalized onto two features](figs/iris_two_features.png)
+
+![Iris marginalized onto three features](figs/iris_three_features.png)
+
+Setosa forms a compact cluster that is clearly separated from the other two species in any marginalization that includes petal length or petal width features. Versicolor and virginica form neighbouring clusters that overlap slightly at their boundary. The sepal features alone separate the classes poorly.
+
+## Part III: PCA
+
+Now we perform PCA using the `PCA` function from scikit-learn to find the top three principal axes of the dataset.
+
+```python
+pca = PCA(n_components=3).fit(X)
+pca.transform(X)
+```
+
+![Iris marginalized onto the top 1, 2 and 3 principal components](figs/iris_pca.png)
+
+The vectors that describe the PCA axes, from `pca.components_`, are:
+
+| Axis | Sepal length | Sepal width | Petal length | Petal width |
+|:---:|:---:|:---:|:---:|:---:|
+| $PC_1$ | $0.362$ | $-0.082$ | $0.857$ | $0.359$ |
+| $PC_2$ | $0.657$ | $0.730$ | $-0.176$ | $-0.075$ |
+| $PC_3$ | $-0.581$ | $0.596$ | $0.073$ | $0.549$ |
+
+
+
+
+## Part IV: Data Compression
+
+The Frobenius norm is defined as the following
+
+$$
+\|X\|_F = \sqrt{\sum_{i,j} x_{ij}^2}
+$$
+
+For a centered data matrix $X$ with $n$ samples, the squared Frobenius norm is proportional to the total variance:
+
+$$
+\|X\|_F^2 = \sum_{i,j} x_{ij}^2 = (n-1)\sum_j \sigma_j^2
+$$
+
+The projection $Z_k = XV_k$ onto the top $k$ PCs has the same relationship, so the fraction of variance explained by those PCs is:
+
+$$
+\frac{\|Z_k\|_F^2}{\|X\|_F^2}
+$$
+
+The code below computes this fraction for the top 1, 2 and 3 PCs:
+
+```python
+total = np.linalg.norm(X - X.mean(axis=0)) ** 2
+np.cumsum(np.sum(Z ** 2, axis=0)) / total
+```
+
+### Q1: Variance in 2-D Representation
+
+Keeping the top two principal axes gives:
+
+$$
+\boxed{\frac{\|Z_2\|_F^2}{\|X\|_F^2} = \frac{665.60}{680.82} \approx 97.76\%}
+$$
+
+### Q2: PCs Required for 50% of the Variance
+
+Only one PC is required, since $PC_1$ alone explains $92.46\%$ of the variance, which is above the $50\%$ threshold.
+
+## Part V: Non-Linear Components
+
+Now we reduce the dataset to two dimensions using the `Isomap` function from scikit-learn with 3 nearest neighbours.
+
+```python
+isomap = Isomap(n_neighbors=3, n_components=2)
+Z_isomap = isomap.fit_transform(X)
+```
+
+![Iris reduced to two dimensions with Isomap](figs/iris_isomap.png)
+
+### Comparison with PCA
+
+PCA is preferable in this case. The data compressed by PCA follows a nearly linear trend, while the Isomap result is more scattered, with versicolor and virginica stretched into separate branches. Using the same variance explained metric from Part IV, the two methods give similar results, but Isomap compresses the data slightly worse than PCA, as shown in the table below. Note the distance metric are used differently for the two method.
+
+| Method (2-D) | $\lVert Z_2 \rVert_F^2$ | Total | Variance explained |
+|:---|:---:|:---:|:---:|
+| PCA | $665.60$ | $680.82$ | $97.76\%$ |
+| Isomap | $1745.00$ | $1813.44$ | $96.23\%$ |
+
+Both totals are $\frac{1}{2n}\sum_{i,j} d_{ij}^2$. PCA uses the straight-line distance $d_{ij} = \|\mathbf{x}_i - \mathbf{x}_j\|_2$, while Isomap uses the geodesic distance, which is the shortest path between samples $i$ and $j$ through the 3-nearest-neighbour graph.
+
+## Appendix: Handwritten Solutions
+
+![Page 1: mean vector and covariance matrix](figs/page1.jpg)
+
+![Page 2: covariance matrix, eigenvalues and eigenvectors](figs/page2.jpg)
+
+![Page 3: decorrelation check and reconstruction error of (3, 3)](figs/page3.jpg)
+
+![Page 4: reconstruction error of (3, 4)](figs/page4.jpg)
+
+## Source Code
+
+- [`main.py`](https://github.com/billylin609/billylin609.github.io/blob/main/src/content/coursework/syde572/assignment3/solns/main.py) runs Parts II to V.
+- [`dataLoader.py`](https://github.com/billylin609/billylin609.github.io/blob/main/src/content/coursework/syde572/assignment3/solns/dataLoader.py) loads the Iris dataset.
