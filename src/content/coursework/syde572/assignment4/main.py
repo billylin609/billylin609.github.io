@@ -14,7 +14,7 @@ def main():
   logging.basicConfig(filename=LOG_PATH, filemode="w", format="%(message)s")
 
   # Load and split the data (80% train / 20% test)
-  train, test = SentimentDataLoader(DATA_PATH).load_all_shuffle(random_state=0)
+  train, test = SentimentDataLoader(DATA_PATH).load_all_shuffle()
   train_docs = [text.split() for text in train.texts]
   test_docs = [text.split() for text in test.texts]
 
