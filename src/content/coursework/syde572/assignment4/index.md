@@ -30,9 +30,9 @@ class SentimentData:
   doc_ids: np.ndarray
 ```
 
-Where `texts` is the review text of each line, `labels` is the pos or neg label
-of the line (mapped to `1` and `-1`), `categories` is the category the review
-comes from, and `doc_ids` is just an identifier.
+Where `texts` is the text of each line, `labels` is the pos or neg label
+of the line (mapped to `1` and `-1`), `categories` is the category each review 
+belongs to, and `doc_ids` is just an identifier.
 
 The way to process the dataset is as follows:
 
@@ -63,8 +63,7 @@ The implementation for loading the data supports three modes. `first_10` mode
 only loads the first 10 data points for quick testing. `load_all` mode loads
 all the data. `load_all_shuffle` mode loads all the data, then shuffles and
 splits the dataset by calling the `train_test_split` method from the `sklearn`
-library. By default, 80% of the data is used for training and 20% for testing,
-and the split is stratified so both sets keep the same pos/neg ratio.
+library. 80% of the data is used for training and 20% for testing.
 (Note: the assignment solution does not use any sklearn method for the Naive Bayes
 model implementation.)
 
@@ -80,8 +79,7 @@ def load_all_shuffle(self, test_size: float = 0.2, random_state: int | None = No
   data = self.load_all()
   parts = train_test_split(data.texts, data.labels, data.categories, data.doc_ids,
                            test_size=test_size, random_state=random_state,
-                           shuffle=True,
-                           stratify=data.labels if stratify else None)
+                           shuffle=True)
   # Split the test_train result 
   self.train = SentimentData(*parts[0::2])
   self.test = SentimentData(*parts[1::2]) 
@@ -243,9 +241,9 @@ def smooth(freqs: Counter, vocab: Iterable[str]) -> dict[str, float]:
 
 Response to the two hints:
 
-- The model itself is not hardcoded to pos and neg: `train_nb` takes the
-  classes from whatever labels it is given, so it also works for the 6-class
-  topic task. Only the data loader maps `pos` and `neg` to `1` and `-1`.
+- The model itself is hardcoded to pos and neg. `train_nb` takes the
+  classes from whatever labels it is given.
+  Only the data loader maps `pos` and `neg` to `1` and `-1`.
 - Smoothing is implemented in the `smooth` function, which is called by
   `train_nb`, so the stored log likelihoods are already smoothed.
 
@@ -253,7 +251,7 @@ Response to the two hints:
 
 The predictor implementation is in three steps. Using the information provided
 in the assignment, the log function is used instead of multiplication. Both
-methods pick the same class because log is monotonic, and the log method avoids
+methods works because log is monotonic, and the log method avoids
 underflow and is easier for comparison. If a word is unknown, the word is
 dropped and ignored in the calculation.
 
@@ -295,8 +293,7 @@ def sanity_check_1(model: NBModel, words: Sequence[str] = ("great", "bad")
 
 With a very short sentence the probability is very small. For the one-word
 document `["great"]`, the positive probability is 0.00132, which is in the
-expected 0.001–0.002 range and higher than the negative probability of
-0.000545, so "great" leans positive as expected.
+expected 0.001–0.002 range.
 
 In the doctest, sanity check 2 is also performed:
 
@@ -328,7 +325,7 @@ We then use the `max` function to evaluate the MAP condition and pick the more
 likely class. A doctest is performed on the first 10 samples, and the error rate
 of the prediction is $\frac{1}{10}$ (only the 3rd review, a negative book review
 that starts by praising the author, is predicted as positive), which shows the
-code is working. (Note: 9 of these 10 reviews are also in the training split, so
+code is working. (Note: all the reviews are also in the training split, so
 this is a functional check, not a fair accuracy measurement.)
 
 ```py
@@ -363,7 +360,7 @@ def classify_documents(docs: Iterable[Sequence[str]], model: NBModel) -> list[Ha
 ```
 
 The accuracy is implemented using `sklearn.metrics.accuracy_score`. (Note: the
-Naive Bayes model is programmed manually; only the `train_test_split` of the
+Naive Bayes model is implemented manually. Only the `train_test_split` of the
 data and the accuracy metric use sklearn, for better readability.)
 
 ```py
@@ -377,7 +374,7 @@ and the accuracy metric here: [`metric.py`](https://github.com/billylin609/billy
 
 ### Result
 
-Evaluating the pos/neg classifier trained on the 80% training split (seed 0) gives:
+Evaluating the pos/neg classifier trained on the 80% training split gives:
 
 | Set | Reviews | Accuracy |
 |---|---|---|

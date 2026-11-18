@@ -77,8 +77,7 @@ class SentimentDataLoader:
     data = self.load_all()
     parts = train_test_split(data.texts, data.labels, data.categories, data.doc_ids,
                              test_size=test_size, random_state=random_state,
-                             shuffle=True,
-                             stratify=data.labels if stratify else None)
+                             shuffle=True)
     self.train = SentimentData(*parts[0::2])
     self.test = SentimentData(*parts[1::2])
     return self.train, self.test
